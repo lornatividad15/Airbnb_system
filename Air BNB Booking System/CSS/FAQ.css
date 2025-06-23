@@ -1,0 +1,187 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  color: #333;
+}
+
+header {
+  width: 100%;
+  background-color: #45526d;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 1102;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.logo img {
+  height: 40px;
+}
+
+/* Hamburger menu button */
+.btn {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 30px;
+  height: 21px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  z-index: 1201;
+  transition: transform 0.3s ease;
+}
+
+.btn span {
+  height: 3px;
+  width: 100%;
+  background-color: white;
+  border-radius: 2px;
+  transition: transform 0.4s ease, opacity 0.4s ease;
+}
+
+.btn.active span:nth-child(1) {
+  transform: translateY(9px) rotate(45deg);
+}
+.btn.active span:nth-child(2) {
+  opacity: 0;
+}
+.btn.active span:nth-child(3) {
+  transform: translateY(-9px) rotate(-45deg);
+}
+
+/* Mobile shadow overlay */
+.shadow {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+}
+.shadow.active {
+  display: block;
+}
+
+/* Mobile nav panel */
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 85%;
+  max-width: 300px;
+  height: 100%;
+  background: #f7f7f7;
+  box-shadow: -2px 0 8px rgba(0, 0, 0, 0.2);
+  padding: 80px 20px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  transition: right 0.3s ease;
+  z-index: 1100;
+}
+.mobile-nav.active {
+  right: 0;
+}
+
+.mobile-nav a {
+  color: #333;
+  text-decoration: none;
+  font-size: 16px;
+  margin: 10px 0;
+  padding: 10px 15px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease;
+}
+.mobile-nav a:hover {
+  background-color: #e4e4e4;
+}
+
+.mobile-nav-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+  padding-top: 20px;
+}
+.mobile-nav h4 {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Hides header navs on large screens (desktop view) */
+@media (min-width: 768px) {
+  .center-nav,
+  .right-nav {
+    display: none !important;
+  }
+}
+
+/* FAQ Styling */
+.faq-container {
+  max-width: 900px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+  padding: 40px 30px;
+}
+
+.faq-container h1 {
+  text-align: center;
+  color: #4a6070;
+  font-size: 2rem;
+  margin-bottom: 30px;
+}
+
+.faq-item {
+  margin-bottom: 28px;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 18px;
+}
+
+.faq-item h2 {
+  font-size: 1.25rem;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.faq-item p {
+  font-size: 1rem;
+  color: #555;
+  line-height: 1.6;
+}
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+
+  .faq-container {
+    padding: 25px 20px;
+  }
+
+  .btn {
+    display: flex;
+  }
+}

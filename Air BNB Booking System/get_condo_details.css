@@ -1,0 +1,25 @@
+.condo-details-box {
+  background: #ffffff;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  color: #333;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.condo-details-box h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+.condo-details-box h3 {
+  font-size: 17px;
+  margin-top: 20px;
+  color: #4a6070;
+}
+
+.condo-details-box p {
+  margin-bottom: 10px;
+}

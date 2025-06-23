@@ -1,0 +1,417 @@
+body{
+margin:0;
+font-family:Arial,sans-serif;
+}
+header{
+background-color:#45526d;
+color:white;
+padding:10px 20px;
+position:sticky;
+top:0;
+z-index:1102;
+}
+.header-inner{
+display:flex;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:10px;
+}
+.logo img{
+height:40px;
+}
+.center-nav,
+.right-nav{
+display:flex;
+gap:15px;
+align-items:center;
+}
+.right-nav{
+transform:translate(-60%);
+}
+.center-nav a,
+.right-nav a{
+position:relative;
+color:white;
+text-decoration:none;
+font-size:14px;
+}
+.center-nav a::after,
+.right-nav a::after{
+content:"";
+position:absolute;
+left:0;
+bottom:-3px;
+height:2px;
+width:0;
+background-color:white;
+transition:width 0.3s ease;
+}
+.center-nav a:hover::after,
+.right-nav a:hover::after{
+width:100%;
+}
+.btn{
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+width:30px;
+height:21px;
+background:none;
+border:none;
+cursor:pointer;
+z-index:1201;
+position:fixed;
+top:20px;
+right:20px;
+}
+.btn:hover{
+transform:scale(1.1);
+}
+.btn span{
+height:3px;
+width:100%;
+background-color:white;
+border-radius:2px;
+transition:transform 0.4s ease,opacity 0.4s ease;
+}
+.btn.active span:nth-child(1){
+transform:translateY(9px) rotate(45deg);
+}
+.btn.active span:nth-child(2){
+opacity:0;
+}
+.btn.active span:nth-child(3){
+transform:translateY(-9px) rotate(-45deg);
+}
+.btn.active span{
+background-color:#333;
+}
+.shadow{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+z-index:1000;
+}
+.shadow.active{
+display:block;
+}
+.mobile-nav{
+position:fixed;
+top:0;
+right:-100%;
+width:85%;
+max-width:300px;
+height:100%;
+background:#f7f7f7;
+box-shadow:-2px 0 8px rgba(0,0,0,0.2);
+padding:80px 20px 40px;
+display:flex;
+flex-direction:column;
+gap:40px;
+transition:right 0.3s ease;
+z-index:1100;
+}
+.mobile-nav.active{
+right:0;
+display: flex !important;
+}
+.mobile-nav a{
+color:#333;
+text-decoration:none;
+font-size:16px;
+margin:10px 0;
+padding:10px 15px;
+border-radius:6px;
+transition:background-color 0.2s ease;
+}
+.mobile-nav a:hover{
+background-color:#e4e4e4;
+}
+.mobile-nav-section{
+display:flex;
+flex-direction:column;
+gap:10px;
+border-top:1px solid #ddd;
+padding-top:20px;
+}
+.mobile-nav h4{
+margin:0;
+font-size:14px;
+color:#666;
+text-transform:uppercase;
+letter-spacing:0.5px;
+}
+.user-menu{
+position:relative;
+color:white;
+cursor:pointer;
+}
+.user-menu span{
+font-size:14px;
+display:inline-block;
+color:white;
+cursor:pointer;
+position:relative;
+}
+.user-menu span::after{
+content:"";
+position:absolute;
+left:0;
+bottom:-3px;
+height:2px;
+width:0;
+background-color:white;
+transition:width 0.3s ease;
+}
+.user-menu span:hover::after{
+width:100%;
+}
+.user-menu .dropdown{
+display:none;
+position:absolute;
+top:30px;
+right:0;
+background-color:#334;
+padding:10px;
+border-radius:6px;
+min-width:120px;
+z-index:1500;
+}
+.user-menu .dropdown.show{
+display:block;
+}
+.user-menu .dropdown a{
+display:block;
+color:white;
+padding:5px 0;
+text-decoration:none;
+font-size:14px;
+}
+.user-menu .dropdown a:hover{
+text-decoration:underline;
+}
+.condos{
+padding:20px;
+}
+.condo-container{
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+.condo-card{
+border:1px solid #ccc;
+padding:10px;
+border-radius:10px;
+overflow:hidden;
+background:#fff;
+transition:transform 0.3s ease;
+}
+.condo-image{
+overflow:hidden;
+position:relative;
+}
+.condo-image img{
+width:100%;
+height:auto;
+max-height:300px;
+object-fit:cover;
+border-radius:10px;
+transition:opacity 0.8s ease-in-out,transform 0.4s ease;
+}
+.condo-image:hover img{
+transform:scale(1.05);
+}
+.condo-image img.fade-out{
+opacity:0;
+}
+.condo-info{
+text-align:center;
+margin-top:10px;
+}
+.condo-info button{
+padding:8px 16px;
+background-color:#45526d;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+transition:background-color 0.3s ease;
+}
+.condo-info button:hover{
+background-color:#303f5d;
+}
+.book-now-btn{
+display:inline-block;
+padding:8px 16px;
+background-color:#45526d;
+color:white;
+border-radius:5px;
+text-decoration:none;
+font-size:14px;
+transition:background-color 0.3s ease;
+}
+.book-now-btn:hover{
+background-color:#303f5d;
+}
+@media (min-width:768px){
+.condo-container{
+flex-direction:row;
+flex-wrap:wrap;
+justify-content:space-around;
+}
+.condo-card{
+flex:0 1 45%;
+}
+#mobileUserMenu,
+#mobileAuthMenu,
+#mobileNavLinks{
+display:none !important;
+}
+}
+@media (max-width:767px){
+.center-nav,
+.right-nav{
+display:none;
+}
+.btn{
+display:flex;
+}
+.mobile-nav{
+display:none;
+}
+.mobile-nav.active{
+display:block;
+}
+.shadow.active{
+display:block;
+}
+}
+.condo-header{
+text-align:center;
+margin-bottom:30px;
+padding-top:20px;
+}
+.condo-header h2{
+font-size:28px;
+font-weight:bold;
+color:#45526d;
+margin:0;
+text-transform:uppercase;
+letter-spacing:1px;
+position:relative;
+display:inline-block;
+}
+.condo-header .underline{
+margin:10px auto 0;
+width:60px;
+height:4px;
+background-color:#45526d;
+border-radius:2px;
+}
+.modal-overlay{
+display:none;
+position:fixed;
+inset:0;
+background-color:rgba(0,0,0,0.6);
+z-index:9999;
+justify-content:center;
+align-items:center;
+}
+.modal-box{
+background-color:#45526d;
+color:white;
+padding:20px 30px;
+border-radius:10px;
+max-width:400px;
+width:90%;
+text-align:center;
+position:relative;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+}
+.modal-box p{
+margin:0;
+font-size:16px;
+}
+.close-btn{
+position:absolute;
+top:10px;
+right:15px;
+font-size:20px;
+color:white;
+cursor:pointer;
+}
+.image-viewer-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  z-index: 99999;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+.image-viewer-modal img {
+  max-width: 90%;
+  max-height: 80vh;
+  border-radius: 8px;
+  box-shadow: 0 0 20px rgba(255,255,255,0.2);
+}
+.image-viewer-modal .close-viewer {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  font-size: 35px;
+  color: white;
+  cursor: pointer;
+}
+.image-viewer-modal .nav-btns {
+  position: absolute;
+  bottom: 40px;
+  display: flex;
+  gap: 20px;
+}
+.image-viewer-modal .nav-btns button {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  font-size: 24px;
+  padding: 10px;
+  border-radius: 50%;
+  z-index: 10000;
+  cursor: pointer;
+  transition: background 0.3s;
+  top: 50%;
+  transform: translateY(-50%);
+  position: absolute;
+  display: flex;
+}
+.image-viewer-modal .nav-btns button:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+
+#mobileUserMenu,
+#mobileAuthMenu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding-top: 15px;
+}
+#mobileUserMenu a,
+#mobileAuthMenu a {
+  display: block;
+  width: 100%;
+  font-size: 16px;
+  text-decoration: none;
+  color: #333;
+  padding: 8px;
+  margin-left: 10px;
+}
+#mobileSignup,
+#mobileProfile{
+  margin-top: 25px;
+}
+

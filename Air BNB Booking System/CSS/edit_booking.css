@@ -1,0 +1,158 @@
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background-color:#f4f4f4;
+}
+header{
+background-color:#45526d;
+color:white;
+padding:10px 20px;
+}
+.header-inner{
+display:flex;
+align-items:center;
+justify-content:space-between;
+}
+.logo img{
+height:40px;
+}
+.center-nav{
+display:flex;
+gap:15px;
+}
+.center-nav a{
+color:white;
+text-decoration:none;
+font-size:14px;
+position:relative;
+}
+.center-nav a::after{
+content:"";
+position:absolute;
+left:0;
+bottom:-3px;
+height:2px;
+width:0;
+background-color:white;
+transition:width 0.3s ease;
+}
+.center-nav a:hover::after{
+width:100%;
+}
+.edit-booking-section{
+padding:40px 20px;
+display:flex;
+justify-content:center;
+}
+.form-container{
+background-color:#fff;
+padding:30px;
+border-radius:10px;
+width:100%;
+max-width:500px;
+box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+.form-container h2{
+text-align:center;
+color:#45526d;
+margin-bottom:20px;
+}
+.form-container label{
+display:block;
+margin-top:15px;
+font-size:14px;
+color:#333;
+}
+.form-container input[type="number"],.input-wrapper input[type="datetime-local"]{
+width:100%;
+padding:10px;
+margin-top:6px;
+border:1px solid #ccc;
+border-radius:6px;
+font-size:14px;
+cursor:pointer;
+}
+.input-wrapper{
+position:relative;
+width:100%;
+cursor:pointer;
+}
+.form-actions{
+display:flex;
+justify-content:space-between;
+margin-top:30px;
+}
+.form-actions button,.form-actions .cancel{
+padding:10px 18px;
+font-size:14px;
+border:none;
+border-radius:6px;
+text-decoration:none;
+cursor:pointer;
+}
+.form-actions .save{
+background-color:#4caf50;
+color:white;
+}
+.form-actions .cancel{
+background-color:#ccc;
+color:#333;
+}
+.modal-overlay{
+display:none;
+position:fixed;
+inset:0;
+background-color:rgba(0,0,0,0.6);
+z-index:9999;
+justify-content:center;
+align-items:center;
+}
+.modal-overlay.active{
+display:flex;
+}
+.modal-box{
+background-color:#fff;
+color:#333;
+padding:20px 30px;
+border-radius:10px;
+max-width:400px;
+width:90%;
+text-align:center;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+position:relative;
+}
+.modal-box p{
+margin:0 0 20px;
+font-size:16px;
+}
+.modal-box .btns{
+display:flex;
+justify-content:center;
+gap:20px;
+}
+.modal-box button{
+padding:6px 14px;
+border:none;
+border-radius:5px;
+font-size:14px;
+cursor:pointer;
+}
+.modal-box .cancel-delete{
+background-color:#ccc;
+color:#333;
+}
+.condo-preview {
+  text-align: center;
+  margin-bottom: 20px;
+}
+.condo-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+.condo-preview h3 {
+  color: #45526d;
+  margin: 0;
+  font-size: 20px;
+}
