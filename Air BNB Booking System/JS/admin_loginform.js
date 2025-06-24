@@ -1,3 +1,5 @@
+// FOR ADMIN LOGIN FORM SCRIPTS
+// FOR ADMIN LOGIN MODAL
 function closeModal() {
   const modalOverlay = document.getElementById('modalOverlay');
   if (modalOverlay) modalOverlay.classList.remove('show');

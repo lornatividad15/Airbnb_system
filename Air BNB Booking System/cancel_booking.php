@@ -1,4 +1,5 @@
 <?php
+//FOR CANCEL BOOKING
 include 'config.php';
 session_start();
 
@@ -12,7 +13,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $reason = trim($_POST['cancellation_reason']);
     $userId = $_SESSION['user_id'];
 
-    // Verify booking belongs to user and is not already cancelled
     $sql = "SELECT * FROM bookings WHERE id = $bookingId AND user_id = $userId AND status = 'confirmed'";
     $result = $conn->query($sql);
 
@@ -21,7 +21,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    // Set status to pending_cancel instead of cancelled
     $reasonEscaped = $conn->real_escape_string($reason);
     $updateSql = "
         UPDATE bookings

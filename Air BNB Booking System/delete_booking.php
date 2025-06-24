@@ -1,4 +1,5 @@
 <?php
+//FOR DELETE BOOKING
 include 'config.php';
 session_start();
 
@@ -10,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bookingId = intval($_POST['booking_id']);
     $userId = $_SESSION['user_id'];
-    // Mark as hidden for this user (not delete from DB)
     $stmt = $conn->prepare("UPDATE bookings SET user_hidden = 1 WHERE id = ? AND user_id = ? AND status = 'cancelled'");
     $stmt->bind_param('ii', $bookingId, $userId);
     $stmt->execute();

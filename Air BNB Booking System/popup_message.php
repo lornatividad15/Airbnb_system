@@ -1,9 +1,9 @@
 <?php
-// popup_message.php
+//FOR POPUP MESSAGE
 $msg = isset($_GET['msg']) ? $_GET['msg'] : 'No message.';
 $type = isset($_GET['type']) ? $_GET['type'] : 'info';
 $redirect = isset($_GET['redirect']) ? $_GET['redirect'] : 'index.php';
-$delay = 4000; // ms (increased from 2000)
+$delay = 4000;
 $color = '#1976d2';
 if ($type === 'error') $color = '#d32f2f';
 if ($type === 'success') $color = '#388e3c';
@@ -21,6 +21,7 @@ if ($type === 'success') $color = '#388e3c';
     }
   </style>
   <script>
+  //FOR POPUP MESSAGE SCRIPTS
     setTimeout(function() {
       window.location.href = <?php echo json_encode($redirect); ?>;
     }, <?php echo $delay; ?>);

@@ -1,4 +1,5 @@
 <?php
+//FOR DELETE FROM DB
 include 'config.php';
 session_start();
 
@@ -9,12 +10,10 @@ if (!isset($_SESSION['admin_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bookingId = intval($_POST['booking_id']);
-    // Permanently delete booking from DB
     $stmt = $conn->prepare("DELETE FROM bookings WHERE id = ?");
     $stmt->bind_param('i', $bookingId);
     $stmt->execute();
     $stmt->close();
-    // Reset AUTO_INCREMENT if all bookings are deleted
     $count = $conn->query("SELECT COUNT(*) as count FROM bookings")->fetch_assoc();
     if ($count['count'] == 0) {
         $conn->query("ALTER TABLE bookings AUTO_INCREMENT = 1");

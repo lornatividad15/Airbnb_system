@@ -1,3 +1,4 @@
+// FOR EDIT BOOKING SCRIPTS
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("editBookingForm");
   const checkinInput = document.getElementById("checkin");

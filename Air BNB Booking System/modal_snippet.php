@@ -1,4 +1,4 @@
-<!-- Shared modal snippet for all PHP pages -->
+<!-- FOR MODAL SNIPPET (SHARED MODAL) -->
 <link rel="stylesheet" href="CSS/modal_global.css" />
 <div id="modalOverlay" class="modal-overlay show">
   <div class="modal-box <?php echo isset($modalType) ? $modalType : ''; ?>">
@@ -9,6 +9,7 @@
   </div>
 </div>
 <script>
+//FOR MODAL SNIPPET SCRIPTS
 function closeModal() {
   document.getElementById('modalOverlay').classList.remove('show');
 }

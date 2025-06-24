@@ -1,3 +1,4 @@
+// FOR FAQ SCRIPTS
 function toggleMenu() {
   document.querySelector(".btn").classList.toggle("active");
   document.getElementById("mobileNav").classList.toggle("active");

@@ -1,3 +1,4 @@
+//FOR BOOKING SCRIPTS
 document.addEventListener("DOMContentLoaded", function () {
   // === NAV TOGGLE ===
   function toggleMenu() {

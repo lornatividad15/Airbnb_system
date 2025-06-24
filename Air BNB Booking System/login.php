@@ -1,4 +1,5 @@
 <?php
+//FOR LOGIN
 session_start();
 require 'config.php';
 
@@ -7,7 +8,7 @@ function setModal($message) {
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $input    = $_POST['email']; // Can be email or username
+    $input    = $_POST['email'];
     $password = $_POST['password'];
 
     $query = "SELECT id, username, password FROM users WHERE email = ? OR username = ?";

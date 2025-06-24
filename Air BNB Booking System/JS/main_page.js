@@ -1,3 +1,4 @@
+// FOR MAIN PAGE SCRIPTS
 // MOBILE NAV TOGGLE
 function toggleMenu() {
   document.querySelector(".btn").classList.toggle("active");

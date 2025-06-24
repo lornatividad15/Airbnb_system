@@ -1,4 +1,5 @@
 <?php
+// FOR DELETE IMAGE
 include 'config.php';
 session_start();
 

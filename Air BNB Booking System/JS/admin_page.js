@@ -1,3 +1,5 @@
+//FOR ADMIN PAGE SCRIPTS
+//FOR ADMIN DROPDOWN MENU
 document.addEventListener("DOMContentLoaded", function () {
   const toggle = document.querySelector(".dropdown-toggle");
   const dropdown = document.querySelector(".dropdown");
@@ -11,7 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
     dropdown.classList.remove("show");
   });
 
-  // Admin delete modal logic
+  //FOR ADMIN DELETE MODAL
   const deleteModal = document.getElementById('adminDeleteModal');
   const deleteForm = document.getElementById('adminDeleteForm');
   const deleteBookingIdInput = document.getElementById('adminDeleteBookingId');
@@ -28,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
     deleteModal.classList.remove('active');
     deleteBookingIdInput.value = '';
   });
-  // Optional: close modal on outside click
+  //FOR ADMIN DELETE MODAL OUTSIDE CLICK
   deleteModal.addEventListener('click', function(e) {
     if (e.target === deleteModal) {
       deleteModal.classList.remove('active');

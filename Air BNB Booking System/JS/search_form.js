@@ -1,3 +1,4 @@
+// FOR SEARCH FORM SCRIPTS
 document.addEventListener("DOMContentLoaded", function () {
   const whereToDropdown = document.querySelector(".dropdown-input");
   const cityList = document.querySelector(".dropdown-list");

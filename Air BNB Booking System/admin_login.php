@@ -1,4 +1,5 @@
 <?php
+//FOR ADMIN LOGIN
 session_start();
 include 'config.php';
 

@@ -1,3 +1,4 @@
+//FOR FIND CONDO SCRIPTS
 document.addEventListener("DOMContentLoaded", () => {
   const isLoggedIn = window.isLoggedIn || false;
   const isAdmin = window.isAdmin || false;

@@ -1,3 +1,4 @@
+//FOR BOOK CONDO SCRIPTS
 // ========== GLOBAL MODAL FUNCTION ==========
 function showModal(message) {
   const modal = document.getElementById("mainModal");

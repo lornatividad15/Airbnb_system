@@ -1,3 +1,4 @@
+//FOR ADMIN PROFILE SCRIPTS
 document.addEventListener("DOMContentLoaded", () => {
     const modal = document.getElementById("infoModal");
     if (modal) {

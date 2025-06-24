@@ -1,4 +1,5 @@
 <?php
+//FOR DELETE CONDO
 include 'config.php';
 session_start();
 
@@ -10,7 +11,6 @@ if (isset($_GET['id'])) {
     $img_stmt->bind_param("i", $condo_id);
     $img_stmt->execute();
     $img_result = $img_stmt->get_result();
-
     $img_stmt->close();
 
     $del_img_sql = "DELETE FROM condo_images WHERE condo_id = ?";

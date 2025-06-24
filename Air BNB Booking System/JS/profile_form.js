@@ -1,3 +1,4 @@
+//FOR PROFILE FORM SCRIPTS
 document.addEventListener('DOMContentLoaded', function () {
   const profileForm = document.getElementById('profileForm');
   const profileImg = document.getElementById('profileImg');
@@ -9,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const newPassword = document.getElementById('newPassword');
   const confirmPassword = document.getElementById('confirmPassword');
 
-  // --- Modal logic (works for both PHP + JS triggered feedback) ---
+  // --- Modal Logic (Works For Both PHP + JS Triggered Feedback) ---
   const modalOverlay = document.getElementById("modalOverlay");
   const modalBox = document.getElementById("modalBox");
   const modalMessage = document.getElementById("modalMessage");
@@ -43,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   }
 
-  // --- Profile image click to open modal viewer ---
+  // --- Profile Image Click To Open Modal Viewer ---
   const viewerModal = document.getElementById('imageViewerModal');
   const viewerImgModal = document.getElementById('viewerImageModal');
   const closeViewerModalBtn = document.getElementById('closeViewerModalBtn');
@@ -65,7 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   }
 
-  // --- Pen icon triggers file input ---
+  // --- Pen Icon Triggers File Input ---
   const editProfilePicBtn = document.getElementById('editProfilePicBtn');
   if (editProfilePicBtn && profileUpload) {
     editProfilePicBtn.onclick = function (e) {
@@ -74,7 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
   }
 
-  // --- Profile picture preview on upload ---
+  // --- Profile Picture Preview On Upload ---
   profileUpload.addEventListener('change', function () {
     const file = this.files[0];
     if (file) {
@@ -86,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // --- Password visibility toggle ---
+  // --- Password Visibility Toggle ---
   window.togglePassword = function (id) {
     const input = document.getElementById(id);
     if (input.type === 'password') {
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   };
 
-  // --- Form validation before submission ---
+  // --- Form Validation Before Submission ---
   profileForm.addEventListener('submit', function (e) {
     function showValidationModal(msg) {
       if (typeof showModal === 'function') {
@@ -137,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  // --- Account delete button ---
+  // --- Account Delete Button ---
   const deleteBtn = document.getElementById('deleteBtn');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', function () {

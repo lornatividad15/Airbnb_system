@@ -1,3 +1,4 @@
+//FOR SIGNUP FORM SCRIPTS
 document.addEventListener('DOMContentLoaded', function () {
   const birthInput = document.getElementById('birthdate');
   const ageInput = document.getElementById('age');

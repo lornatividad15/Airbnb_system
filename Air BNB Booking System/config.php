@@ -1,4 +1,5 @@
 <?php
+//FOR CONFIG
 $host = 'localhost';
 $db   = 'airbnb_system';
 $user = 'root';

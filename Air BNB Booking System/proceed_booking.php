@@ -1,4 +1,5 @@
 <?php
+//FOR PROCEED BOOKING
 include 'config.php';
 session_start();
 
@@ -10,7 +11,6 @@ if (!isset($_SESSION['user_id'])) {
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bookingId = intval($_POST['booking_id'] ?? 0);
-    // Only allow user to update their own booking
     $userId = $_SESSION['user_id'];
     $stmt = $conn->prepare("UPDATE bookings SET status = 'confirmed' WHERE id = ? AND user_id = ? AND status = 'cancel_rejected'");
     $stmt->bind_param('ii', $bookingId, $userId);
