@@ -15,7 +15,7 @@ $booking_sql = "SELECT
     MIN(checkin) AS earliest_checkin,
     MAX(checkout) AS latest_checkout
   FROM bookings
-  WHERE condo_id = ?";
+  WHERE condo_id = ? AND status != 'cancelled' AND checkout >= NOW()";
 $booking_stmt = $conn->prepare($booking_sql);
 $booking_stmt->bind_param("i", $condo_id);
 $booking_stmt->execute();
@@ -38,7 +38,7 @@ $condo = $condo_result->fetch_assoc();
 $condo_stmt->close();
 
 // Fetch bookings for this condo
-$bookings_sql = "SELECT b.*, u.username, u.firstname, u.lastname, u.email, u.phone_number FROM bookings b JOIN users u ON b.user_id = u.id WHERE b.condo_id = ? ORDER BY b.checkin DESC";
+$bookings_sql = "SELECT b.*, u.username, u.firstname, u.lastname, u.email, u.phone_number FROM bookings b JOIN users u ON b.user_id = u.id WHERE b.condo_id = ? AND (b.status = 'Confirmed' OR b.status = 'Confirmed (Cancellation Rejected)') AND b.checkout >= NOW() ORDER BY b.checkin DESC";
 $bookings_stmt = $conn->prepare($bookings_sql);
 $bookings_stmt->bind_param("i", $condo_id);
 $bookings_stmt->execute();
@@ -74,6 +74,8 @@ if ($condo):
         <div class="condo-booking-entry">
           <p><strong>User:</strong> <?= htmlspecialchars($b['firstname'] . ' ' . $b['lastname']) ?> (<?= htmlspecialchars($b['username']) ?>)</p>
           <p><strong>Email:</strong> <?= htmlspecialchars($b['email']) ?> | <strong>Phone:</strong> <?= htmlspecialchars($b['phone_number']) ?></p>
+          <p><strong>Guests:</strong> <?= htmlspecialchars($b['guest_count']) ?></p>
+          <p><strong>Day/s Use:</strong> <?= (new DateTime($b['checkin']))->diff(new DateTime($b['checkout']))->days ?></p>
           <p><strong>Check-in:</strong> <?= date('M d, Y - h:i A', strtotime($b['checkin'])) ?> | <strong>Check-out:</strong> <?= date('M d, Y - h:i A', strtotime($b['checkout'])) ?></p>
           <p><strong>Status:</strong> <?= htmlspecialchars($b['status']) ?></p>
         </div>

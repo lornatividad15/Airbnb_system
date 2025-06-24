@@ -98,7 +98,7 @@ $userId = $_SESSION['user_id'];
         SELECT b.*, c.name AS condo_name, c.description, c.id AS condo_id
         FROM bookings b
         JOIN condos c ON b.condo_id = c.id
-        WHERE b.user_id = $userId AND (b.status != 'cancelled' OR (b.status = 'cancelled' AND IFNULL(b.user_hidden,0) = 0))
+        WHERE b.user_id = $userId AND (b.status != 'Cancelled' OR (b.status = 'Cancelled' AND IFNULL(b.user_hidden,0) = 0))
         ORDER BY b.checkin DESC
       ";
       $result = $conn->query($sql);
@@ -131,27 +131,31 @@ $userId = $_SESSION['user_id'];
             <p><strong>Check-in:</strong> <?= $checkin ?></p>
             <p><strong>Check-out:</strong> <?= $checkout ?></p>
             <div class="booking-status">
-              <strong>Status:</strong> <?= ucfirst(str_replace('_', ' ', $status)) ?>
-              <?php if ($status === 'cancel_rejected'): ?>
-                <span class="cancel-rejected-label" style="color: #d32f2f; font-weight: bold; display: block; margin-top: 6px;">
+              <strong>Status:</strong> <?= htmlspecialchars($status) ?>
+              <?php if ($status === 'Confirmed (Cancellation Rejected)'): ?>
+                <span class="cancel-rejected-label" style="color: #388e3c; font-weight: bold; display: block; margin-top: 6px;">
                   Cancellation Rejected (Contact support@airbnb.com or call (555) 123-4567)
+                </span>
+              <?php endif; ?>
+              <?php if ($status === 'Pending'): ?>
+                <span class="pending-cancel-label" style="color: #fbc02d; font-weight: bold; display: block; margin-top: 6px;">
+                  Pending Cancellation (Admin review)
                 </span>
               <?php endif; ?>
             </div>
             <div class="booking-actions" style="margin-top:18px;">
-              <?php if ($status === 'confirmed'): ?>
+              <?php if ($status === 'Confirmed' || $status === 'Confirmed (Cancellation Rejected)'): ?>
                 <a class="edit-btn" href="edit_booking.php?booking_id=<?= $bookingId ?>">Edit</a>
+              <?php endif; ?>
+              <?php if ($status === 'Confirmed'): ?>
                 <form method="POST" action="cancel_booking.php" class="cancel-form" style="display:inline;">
                   <input type="hidden" name="booking_id" value="<?= $bookingId ?>">
                   <button type="button" class="delete-btn open-cancel-modal">Cancel</button>
                 </form>
-              <?php elseif ($status === 'pending_cancel'): ?>
-                <span class="pending-cancel-label">Pending Cancellation (Admin review)</span>
-              <?php elseif ($status === 'cancel_rejected'): ?>
-                <button type="button" class="cancel-form-btn hide-booking-btn" data-booking-id="<?= $bookingId ?>">Delete</button>
-                <button type="button" class="proceed-btn show-proceed-modal" data-booking-id="<?= $bookingId ?>" style="margin-left:10px; background:#1976d2; color:#fff; padding:8px 16px; border-radius:4px; font-weight:500;">Proceed Your Booking</button>
+              <?php elseif ($status === 'Confirmed (Cancellation Rejected)'): ?>
+                <button type="button" class="cancel-btn" disabled style="opacity:0.5; cursor:not-allowed; margin-left:10px;">Cancel</button>
               <?php endif; ?>
-              <?php if ($status === 'cancelled'): ?>
+              <?php if ($status === 'Cancelled'): ?>
                 <form method="POST" action="delete_booking.php" class="delete-form" style="display:inline;">
                   <input type="hidden" name="booking_id" value="<?= $bookingId ?>">
                   <button type="submit" class="cancel-form-btn">Delete</button>
@@ -198,6 +202,15 @@ $userId = $_SESSION['user_id'];
   </div>
 </div>
 
+<!-- POPUP MESSAGE MODAL (ALIGNED WITH PAGE DESIGN) -->
+<div id="popupMessageModal" class="modal-overlay">
+  <div class="modal-box">
+    <span class="close-btn" id="popupMessageCloseBtn">&times;</span>
+    <p id="popupMessageText"></p>
+    <button id="popupMessageOkBtn" class="confirm-btn">OK</button>
+  </div>
+</div>
+
 <script src="JS/booking.js"></script>
 <script>
   window.isLoggedIn = <?= json_encode($isLoggedIn); ?>;
@@ -205,7 +218,7 @@ $userId = $_SESSION['user_id'];
   // Show message if booking delete (hide) was successful
   <?php if (isset($_GET['deleted'])): ?>
     window.addEventListener('DOMContentLoaded', function() {
-      showModal('Booking deleted from your view.');
+      showPopupMessage('Booking deleted from your view.');
     });
   <?php endif; ?>
 

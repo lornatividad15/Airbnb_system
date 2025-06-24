@@ -391,6 +391,77 @@ color:#f44336;
   background: #115293 !important;
   color: #fff !important;
 }
+/* FOR CANCEL_REJECTED DELETE BUTTON (USER) */
+.user-delete-cancel-rejected {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.user-delete-cancel-rejected:hover, .user-delete-cancel-rejected:focus {
+  background: #b71c1c;
+  color: #fff;
+}
+/* FOR POPUP MESSAGE MODAL (ALIGNED WITH PAGE DESIGN) */
+#popupMessageModal.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0,0,0,0.6);
+  z-index: 9999;
+  justify-content: center;
+  align-items: center;
+}
+#popupMessageModal.modal-overlay.active {
+  display: flex;
+}
+#popupMessageModal .modal-box {
+  background-color: #fff;
+  color: #333;
+  padding: 24px 32px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+}
+#popupMessageModal .modal-box p {
+  margin: 0 0 20px;
+  font-size: 16px;
+}
+#popupMessageModal .modal-box .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.3s ease;
+}
+#popupMessageModal .modal-box .close-btn:hover {
+  color: #f44336;
+}
+#popupMessageModal .modal-box .confirm-btn {
+  background-color: #45526d;
+  color: white;
+  border-radius: 6px;
+  padding: 8px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+}
+#popupMessageModal .modal-box .confirm-btn:hover {
+  background-color: #334159;
+}
 @media (min-width:768px){
 .booking-container{
 flex-direction:row;

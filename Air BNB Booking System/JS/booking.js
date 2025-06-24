@@ -1,4 +1,4 @@
-//FOR BOOKING SCRIPTS
+// FOR BOOKING SCRIPTS
 document.addEventListener("DOMContentLoaded", function () {
   // === NAV TOGGLE ===
   function toggleMenu() {
@@ -53,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
   messageModalCloseBtn?.addEventListener("click", closeModal);
   messageModalCloseIcon?.addEventListener("click", closeModal);
 
-  // Close modal when clicking outside modal box
   messageModal?.addEventListener("click", (e) => {
     if (e.target === messageModal) {
       closeModal();
@@ -94,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const deleteBtn = form.querySelector(".delete-btn");
     if (deleteBtn) {
       deleteBtn.addEventListener("click", (e) => {
-        e.preventDefault(); // Prevent immediate submission
+        e.preventDefault();
         formToDelete = form;
         deleteModal.classList.add("active");
       });
@@ -128,4 +127,102 @@ document.addEventListener("DOMContentLoaded", function () {
     formToDelete = null;
     if (cancellationReasonInput) cancellationReasonInput.value = "";
   });
+
+  // === USER DELETE CANCEL_REJECTED BOOKING ===
+  document.querySelectorAll('.user-delete-cancel-rejected').forEach(function (btn) {
+    btn.addEventListener('click', function (e) {
+      e.preventDefault();
+      const bookingId = btn.getAttribute('data-booking-id');
+      if (!bookingId) {
+        showPopupMessage('BOOKING ID NOT FOUND.');
+        return;
+      }
+      showPopupMessage('Are you sure you want to delete this booking?', function onConfirm() {
+        fetch('hide_booking.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: 'booking_id=' + encodeURIComponent(bookingId)
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              const bookingRow = btn.closest('.booking-row, .booking-card, tr');
+              showPopupMessage('Booking Successfully Deleted.', () => {
+                if (bookingRow) bookingRow.remove();
+              });
+            } else {
+              showPopupMessage(data.message || 'FAILED TO DELETE BOOKING.');
+            }
+          })
+          .catch(() => {
+            showPopupMessage('ERROR OCCURRED WHILE DELETING BOOKING.');
+          });
+      }, true);
+    });
+  });
+
+  // === POPUP MESSAGE MODAL LOGIC ===
+  const popupMessageModal = document.getElementById("popupMessageModal");
+  const popupMessageText = document.getElementById("popupMessageText");
+  const popupMessageCloseBtn = document.getElementById("popupMessageCloseBtn");
+  const popupMessageOkBtn = document.getElementById("popupMessageOkBtn");
+
+  function showPopupMessage(message, onConfirm, isConfirm) {
+    if (!isConfirm) {
+      if (popupMessageText && popupMessageModal) {
+        popupMessageText.textContent = message;
+        popupMessageModal.classList.add("active");
+        popupMessageOkBtn.textContent = "OK";
+        popupMessageOkBtn.style.display = "inline-block";
+        popupMessageCloseBtn.style.display = "inline-block";
+
+        function cleanup() {
+          popupMessageModal.classList.remove("active");
+          popupMessageOkBtn.onclick = null;
+          popupMessageCloseBtn.onclick = null;
+        }
+
+        popupMessageOkBtn.onclick = function () {
+          cleanup();
+          if (typeof onConfirm === "function") onConfirm();
+        };
+
+        popupMessageCloseBtn.onclick = cleanup;
+        popupMessageModal.onclick = function (e) {
+          if (e.target === popupMessageModal) cleanup();
+        };
+      } else {
+        if (typeof onConfirm === "function") onConfirm();
+        else alert(message);
+      }
+      return;
+    }
+
+    if (popupMessageText && popupMessageModal) {
+      popupMessageText.textContent = message;
+      popupMessageModal.classList.add("active");
+      popupMessageOkBtn.textContent = "Yes";
+      popupMessageOkBtn.style.display = "inline-block";
+      popupMessageCloseBtn.style.display = "inline-block";
+
+      function cleanup() {
+        popupMessageModal.classList.remove("active");
+        popupMessageOkBtn.textContent = "OK";
+        popupMessageOkBtn.onclick = null;
+        popupMessageCloseBtn.onclick = null;
+      }
+
+      popupMessageOkBtn.onclick = function () {
+        cleanup();
+        if (typeof onConfirm === "function") onConfirm();
+      };
+
+      popupMessageCloseBtn.onclick = cleanup;
+      popupMessageModal.onclick = function (e) {
+        if (e.target === popupMessageModal) cleanup();
+      };
+    } else {
+      if (confirm(message)) onConfirm();
+    }
+  }
 });

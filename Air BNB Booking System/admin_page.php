@@ -78,7 +78,7 @@ $condo_result = $conn->query($condo_sql);
     <h2>Booking Cancellation Requests</h2>
     <div class="admin-bookings-list">
       <?php
-      $pendingSql = "SELECT b.*, u.username, u.email, u.firstname, u.lastname, u.phone_number, c.name AS condo_name FROM bookings b JOIN users u ON b.user_id = u.id JOIN condos c ON b.condo_id = c.id WHERE b.status = 'pending_cancel' ORDER BY b.checkin DESC";
+      $pendingSql = "SELECT b.*, u.username, u.email, u.firstname, u.lastname, u.phone_number, c.name AS condo_name FROM bookings b JOIN users u ON b.user_id = u.id JOIN condos c ON b.condo_id = c.id WHERE b.status = 'Pending' ORDER BY b.checkin DESC";
       $pendingResult = $conn->query($pendingSql);
       if ($pendingResult && $pendingResult->num_rows > 0):
         while ($row = $pendingResult->fetch_assoc()):
@@ -96,12 +96,6 @@ $condo_result = $conn->query($condo_sql);
             <button type="submit" name="action" value="approve" class="approve-btn">Approve Cancel</button>
             <button type="submit" name="action" value="reject" class="reject-btn">Reject Cancel</button>
           </form>
-          <?php if ($row['status'] === 'cancelled'): ?>
-          <form method="POST" action="delete_from_db.php" class="admin-delete-form" style="display:inline-block; margin-left:10px;">
-            <input type="hidden" name="booking_id" value="<?= $row['id'] ?>">
-            <button type="button" class="delete-btn admin-delete-modal-btn" style="background-color:#dc3545;">Delete</button>
-          </form>
-          <?php endif; ?>
         </div>
       <?php endwhile; else: ?>
         <p>No pending cancellation requests.</p>
@@ -110,30 +104,26 @@ $condo_result = $conn->query($condo_sql);
   </div>
 
   <div class="admin-bookings-section">
-    <h2>Deletable Bookings (Cancelled or Completed)</h2>
+    <h2>Deletable Bookings (Canceled & Past Dates)</h2>
     <div class="admin-bookings-list">
       <?php
-      $now = date('Y-m-d H:i:s');
-      $deletableSql = "SELECT b.*, u.username, u.email, u.firstname, u.lastname, u.phone_number, c.name AS condo_name FROM bookings b JOIN users u ON b.user_id = u.id JOIN condos c ON b.condo_id = c.id WHERE (b.status = 'cancelled' OR b.checkout < '$now') ORDER BY b.checkin DESC";
+      $deletableSql = "SELECT b.*, u.username, u.email, u.firstname, u.lastname, u.phone_number, c.name AS condo_name, DATEDIFF(b.checkout, b.checkin) AS days_use FROM bookings b JOIN users u ON b.user_id = u.id JOIN condos c ON b.condo_id = c.id WHERE (b.status = 'Cancelled' OR b.checkout < NOW()) ORDER BY b.checkin DESC";
       $deletableResult = $conn->query($deletableSql);
       if ($deletableResult && $deletableResult->num_rows > 0):
         while ($row = $deletableResult->fetch_assoc()):
       ?>
         <div class="admin-booking-card">
           <h4><?= htmlspecialchars($row['condo_name']) ?> (Booking #<?= $row['id'] ?>)</h4>
-          <p><strong>User:</strong> <?= htmlspecialchars($row['firstname'] . ' ' . $row['lastname']) ?> (<?= htmlspecialchars($row['username']) ?>)</p>
-          <p><strong>Email:</strong> <?= htmlspecialchars($row['email']) ?></p>
-          <p><strong>Phone:</strong> <?= htmlspecialchars($row['phone_number']) ?></p>
           <p><strong>Check-in:</strong> <?= date('M d, Y - h:i A', strtotime($row['checkin'])) ?></p>
           <p><strong>Check-out:</strong> <?= date('M d, Y - h:i A', strtotime($row['checkout'])) ?></p>
           <p><strong>Status:</strong> <?= htmlspecialchars($row['status']) ?></p>
           <form method="POST" action="delete_from_db.php" class="admin-delete-form" style="display:inline-block;">
             <input type="hidden" name="booking_id" value="<?= $row['id'] ?>">
-            <button type="button" class="delete-btn admin-delete-modal-btn">Delete</button>
+            <button type="submit" class="delete-btn" style="background-color:#dc3545;">Delete</button>
           </form>
         </div>
       <?php endwhile; else: ?>
-        <p>No deletable bookings found.</p>
+        <p>No deletable bookings.</p>
       <?php endif; ?>
     </div>
   </div>
