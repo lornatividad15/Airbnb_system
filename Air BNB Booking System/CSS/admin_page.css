@@ -172,6 +172,73 @@ h1 {
   margin-bottom: 15px;
   color: #45526d;
 }
+/* Modal overlay for delete condo */
+#deleteCondoModal.modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.35);
+  justify-content: center;
+  align-items: center;
+}
+#deleteCondoModal.show {
+  display: flex;
+}
+#deleteCondoModal .modal-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 32px 28px 24px 28px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
+  max-width: 350px;
+  text-align: center;
+}
+#deleteCondoModal .modal-box p {
+  margin-bottom: 24px;
+  color: #333;
+  font-size: 1.08rem;
+}
+#deleteCondoModal .modal-box .confirm-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#deleteCondoModal .modal-box .confirm-btn:hover {
+  background: #c0392b;
+}
+#deleteCondoModal .modal-box .cancel-btn {
+  background: #eee;
+  color: #333;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 18px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.2s;
+}
+#deleteCondoModal .modal-box .cancel-btn:hover {
+  background: #ccc;
+}
+#deleteCondoModal .close-btn {
+  position: absolute;
+  top: 10px;
+  right: 18px;
+  font-size: 1.5rem;
+  color: #888;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
 @media screen and (max-width: 768px) {
   .main-flex-container {
     flex-direction: column;

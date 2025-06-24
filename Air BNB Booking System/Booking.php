@@ -98,7 +98,7 @@ $userId = $_SESSION['user_id'];
         SELECT b.*, c.name AS condo_name, c.description, c.id AS condo_id
         FROM bookings b
         JOIN condos c ON b.condo_id = c.id
-        WHERE b.user_id = $userId AND b.status = 'confirmed'
+        WHERE b.user_id = $userId AND (b.status != 'cancelled' OR (b.status = 'cancelled' AND IFNULL(b.user_hidden,0) = 0))
         ORDER BY b.checkin DESC
       ";
       $result = $conn->query($sql);
@@ -112,6 +112,7 @@ $userId = $_SESSION['user_id'];
           $guestCount = $row['guest_count'];
           $checkin = date('M d, Y - h:i A', strtotime($row['checkin']));
           $checkout = date('M d, Y - h:i A', strtotime($row['checkout']));
+          $status = $row['status'];
 
           $imgQuery = "SELECT image_path FROM condo_images WHERE condo_id = $condoId LIMIT 1";
           $imgResult = $conn->query($imgQuery);
@@ -129,12 +130,33 @@ $userId = $_SESSION['user_id'];
             <p><strong>Guests:</strong> <?= $guestCount ?></p>
             <p><strong>Check-in:</strong> <?= $checkin ?></p>
             <p><strong>Check-out:</strong> <?= $checkout ?></p>
-            <div class="booking-actions">
-              <a class="edit-btn" href="edit_booking.php?booking_id=<?= $bookingId ?>">Edit</a>
-              <form method="POST" action="cancel_booking.php" class="cancel-form">
-                <input type="hidden" name="booking_id" value="<?= $bookingId ?>">
-                <button type="button" class="delete-btn open-cancel-modal">Cancel</button>
-              </form>
+            <div class="booking-status">
+              <strong>Status:</strong> <?= ucfirst(str_replace('_', ' ', $status)) ?>
+              <?php if ($status === 'cancel_rejected'): ?>
+                <span class="cancel-rejected-label" style="color: #d32f2f; font-weight: bold; display: block; margin-top: 6px;">
+                  Cancellation Rejected (Contact support@airbnb.com or call (555) 123-4567)
+                </span>
+              <?php endif; ?>
+            </div>
+            <div class="booking-actions" style="margin-top:18px;">
+              <?php if ($status === 'confirmed'): ?>
+                <a class="edit-btn" href="edit_booking.php?booking_id=<?= $bookingId ?>">Edit</a>
+                <form method="POST" action="cancel_booking.php" class="cancel-form" style="display:inline;">
+                  <input type="hidden" name="booking_id" value="<?= $bookingId ?>">
+                  <button type="button" class="delete-btn open-cancel-modal">Cancel</button>
+                </form>
+              <?php elseif ($status === 'pending_cancel'): ?>
+                <span class="pending-cancel-label">Pending Cancellation (Admin review)</span>
+              <?php elseif ($status === 'cancel_rejected'): ?>
+                <button type="button" class="cancel-form-btn hide-booking-btn" data-booking-id="<?= $bookingId ?>">Delete</button>
+                <button type="button" class="proceed-btn show-proceed-modal" data-booking-id="<?= $bookingId ?>" style="margin-left:10px; background:#1976d2; color:#fff; padding:8px 16px; border-radius:4px; font-weight:500;">Proceed Your Booking</button>
+              <?php endif; ?>
+              <?php if ($status === 'cancelled'): ?>
+                <form method="POST" action="delete_booking.php" class="delete-form" style="display:inline;">
+                  <input type="hidden" name="booking_id" value="<?= $bookingId ?>">
+                  <button type="submit" class="cancel-form-btn">Delete</button>
+                </form>
+              <?php endif; ?>
             </div>
           </div>
         </div>
@@ -165,11 +187,85 @@ $userId = $_SESSION['user_id'];
   </div>
 </div>
 
+<div id="proceedModal" class="modal-overlay">
+  <div class="modal-box">
+    <p>Are you sure you want to proceed with this booking?</p>
+    <div style="margin-top: 20px;">
+      <button id="proceedYesBtn" class="confirm-btn">Yes</button>
+      <button id="proceedNoBtn" class="cancel-btn">No</button>
+    </div>
+    <span class="close-btn" id="closeProceedModal">&times;</span>
+  </div>
+</div>
+
+<script src="JS/booking.js"></script>
 <script>
   window.isLoggedIn = <?= json_encode($isLoggedIn); ?>;
   window.isAdmin = <?= json_encode($isAdmin); ?>;
+  // Show message if booking delete (hide) was successful
+  <?php if (isset($_GET['deleted'])): ?>
+    window.addEventListener('DOMContentLoaded', function() {
+      showModal('Booking deleted from your view.');
+    });
+  <?php endif; ?>
+
+  // Hide booking card on Delete (user side only)
+  document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.hide-booking-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var card = btn.closest('.booking-card');
+        if (card) card.style.display = 'none';
+        // Optionally, send AJAX to set user_hidden=1 for this booking
+      });
+    });
+
+    // Proceed modal logic
+    let proceedModal = document.getElementById('proceedModal');
+    let proceedYesBtn = document.getElementById('proceedYesBtn');
+    let proceedNoBtn = document.getElementById('proceedNoBtn');
+    let closeProceedModal = document.getElementById('closeProceedModal');
+    let currentBookingId = null;
+    let currentCard = null;
+
+    document.querySelectorAll('.show-proceed-modal').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        currentBookingId = btn.getAttribute('data-booking-id');
+        currentCard = btn.closest('.booking-card');
+        proceedModal.classList.add('active');
+      });
+    });
+    function closeProceed() {
+      proceedModal.classList.remove('active');
+      currentBookingId = null;
+      currentCard = null;
+    }
+    proceedNoBtn.addEventListener('click', closeProceed);
+    closeProceedModal.addEventListener('click', closeProceed);
+    proceedYesBtn.addEventListener('click', function() {
+      if (!currentBookingId || !currentCard) return closeProceed();
+      // AJAX to update status to confirmed
+      fetch('proceed_booking.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: 'booking_id=' + encodeURIComponent(currentBookingId)
+      })
+      .then(res => res.json())
+      .then(data => {
+        closeProceed(); // Close modal immediately
+        if (data.success) {
+          // Redirect to popup_message.php for confirmation
+          window.location.href = 'popup_message.php?msg=' + encodeURIComponent('You have chosen to proceed with your booking.') + '&type=success&redirect=booking.php';
+        } else {
+          window.location.href = 'popup_message.php?msg=' + encodeURIComponent('Failed to proceed with your booking.') + '&type=error&redirect=booking.php';
+        }
+      })
+      .catch(() => {
+        closeProceed();
+        window.location.href = 'popup_message.php?msg=' + encodeURIComponent('Failed to proceed with your booking.') + '&type=error&redirect=booking.php';
+      });
+    });
+  });
 </script>
-<script src="JS/booking.js"></script>
 
 </body>
 </html>

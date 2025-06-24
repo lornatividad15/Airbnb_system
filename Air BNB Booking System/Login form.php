@@ -79,6 +79,20 @@ session_start();
         }, 3000);
       });
     <?php unset($_SESSION['modal_message']); endif; ?>
+
+    // Show modal if account deleted (from ?deleted=1 in URL)
+    document.addEventListener('DOMContentLoaded', function () {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('deleted') === '1') {
+        const modal = document.getElementById('modal');
+        const modalMsg = document.getElementById('modal-message');
+        modalMsg.innerHTML = `<span style='color:green; font-size:1.5em; margin-right:8px;'><i class='fa-solid fa-check-circle'></i></span>Account deleted successfully.`;
+        modal.classList.add('show');
+        setTimeout(() => {
+          modal.classList.remove('show');
+        }, 3000);
+      }
+    });
   </script>
 
 </body>

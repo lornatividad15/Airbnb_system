@@ -6,6 +6,7 @@ if (!isset($_GET['id'])) {
     $modalMessage = 'No condo selected';
     $modalType = 'error';
     $showModal = true;
+    $modalRedirect = true;
     echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
     include __DIR__ . '/modal_snippet.php';
     exit;
@@ -22,6 +23,7 @@ if ($result->num_rows == 0) {
     $modalMessage = 'Condo not found';
     $modalType = 'error';
     $showModal = true;
+    $modalRedirect = true;
     echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
     include __DIR__ . '/modal_snippet.php';
     exit;
@@ -61,6 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
     $modalMessage = 'Condo updated successfully!';
     $modalType = 'success';
     $showModal = true;
+    $modalRedirect = true;
     echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
     include __DIR__ . '/modal_snippet.php';
     exit;
@@ -73,6 +76,15 @@ $img_stmt->execute();
 $img_result = $img_stmt->get_result();
 $images = $img_result->fetch_all(MYSQLI_ASSOC);
 $img_stmt->close();
+
+// Show modal if image was deleted
+if (isset($_GET['img_deleted']) && $_GET['img_deleted'] == 1) {
+    $modalMessage = 'Image deleted successfully!';
+    $modalType = 'success';
+    $showModal = true;
+    $modalRedirect = false;
+    include __DIR__ . '/modal_snippet.php';
+}
 ?>
 
 <!DOCTYPE html>
@@ -129,9 +141,10 @@ $img_stmt->close();
         <?php foreach ($images as $img): ?>
           <div class="image-wrapper">
             <img src="Images/<?= htmlspecialchars($img['image_path']) ?>" alt="Condo Image">
-            <a href="delete_image.php?image_id=<?= $img['id'] ?>&condo_id=<?= $condo_id ?>" 
-               onclick="return confirm('Delete this image?')" 
-               class="delete-btn-link">×</a>
+            <a href="#" 
+               class="delete-btn-link open-delete-image-modal" 
+               data-image-id="<?= $img['id'] ?>" 
+               data-condo-id="<?= $condo_id ?>">×</a>
           </div>
         <?php endforeach; ?>
       </div>
@@ -148,6 +161,46 @@ $img_stmt->close();
     </div>
   </form>
 </main>
+
+<!-- Delete Image Modal -->
+<div id="deleteImageModal" class="modal-overlay">
+  <div class="modal-box">
+    <p>Delete this image?</p>
+    <div style="margin-top: 20px; display: flex; gap: 16px; justify-content: center;">
+      <form id="deleteImageForm" method="GET" action="delete_image.php" style="display:inline;">
+        <input type="hidden" name="image_id" id="deleteImageId" value="">
+        <input type="hidden" name="condo_id" id="deleteCondoId" value="">
+        <button type="submit" class="confirm-btn">Delete</button>
+      </form>
+      <button type="button" class="cancel-btn" id="cancelDeleteImageBtn">Cancel</button>
+    </div>
+    <span class="close-btn" id="closeDeleteImageModal">&times;</span>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.open-delete-image-modal').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('deleteImageId').value = this.getAttribute('data-image-id');
+      document.getElementById('deleteCondoId').value = this.getAttribute('data-condo-id');
+      document.getElementById('deleteImageModal').classList.add('show');
+    });
+  });
+  document.getElementById('cancelDeleteImageBtn').onclick = function() {
+    document.getElementById('deleteImageModal').classList.remove('show');
+  };
+  document.getElementById('closeDeleteImageModal').onclick = function() {
+    document.getElementById('deleteImageModal').classList.remove('show');
+  };
+  document.getElementById('deleteImageModal').onclick = function(e) {
+    if (e.target === this) {
+      this.classList.remove('show');
+    }
+  };
+});
+</script>
 
 </body>
 </html>

@@ -8,9 +8,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $address = $_POST['address'];
     $description = $_POST['description'];
 
-    $modalMessage = '';
-    $modalType = 'error';
-    $showModal = false;
+    $message = '';
+    $type = 'error';
+    $redirect = 'admin_page.php';
 
     if (isset($_FILES['images']) && count($_FILES['images']['name']) > 0) {
         $imageFiles = $_FILES['images'];
@@ -25,9 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($coverImageIndex === -1) {
-            $modalMessage = 'Please upload at least one valid image.';
-            $modalType = 'error';
-            $showModal = true;
+            $message = 'Please upload at least one valid image.';
+            $type = 'error';
         } else {
             $coverImage = basename($imageFiles['name'][$coverImageIndex]);
             $coverImagePath = $targetDir . $coverImage;
@@ -63,33 +62,28 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             mysqli_stmt_close($imgStmt);
                         }
 
-                        $modalMessage = 'Condo and images added successfully!';
-                        $modalType = 'success';
-                        $showModal = true;
-                        // Redirect after short delay using JS
-                        echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
+                        $message = 'Condo and images added successfully!';
+                        $type = 'success';
                     } else {
-                        $modalMessage = 'Failed to add condo.';
-                        $modalType = 'error';
-                        $showModal = true;
+                        $message = 'Failed to add condo.';
+                        $type = 'error';
                     }
                     mysqli_stmt_close($stmt);
                 } else {
-                    $modalMessage = 'Failed to prepare statement.';
-                    $modalType = 'error';
-                    $showModal = true;
+                    $message = 'Failed to prepare statement.';
+                    $type = 'error';
                 }
             } else {
-                $modalMessage = 'Failed to upload cover image.';
-                $modalType = 'error';
-                $showModal = true;
+                $message = 'Failed to upload cover image.';
+                $type = 'error';
             }
         }
     } else {
-        $modalMessage = 'Please upload at least one image.';
-        $modalType = 'error';
-        $showModal = true;
+        $message = 'Please upload at least one image.';
+        $type = 'error';
     }
+    header("Location: popup_message.php?msg=" . urlencode($message) . "&type=$type&redirect=$redirect");
+    exit;
 }
 ?>
 
@@ -100,7 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add Condo</title>
   <link rel="stylesheet" href="CSS/add_condo.css" />
-  <link rel="stylesheet" href="CSS/modal_global.css" />
 </head>
 <body>
 
@@ -154,27 +147,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <button type="submit">Add Condo</button>
     <a href="admin_page.php" class="back-link">← Back to Admin Page</a>
   </form>
-
-  <!-- Modal for messages -->
-  <div id="modalOverlay" class="modal-overlay<?php if (!empty($showModal)) echo ' show'; ?>">
-    <div class="modal-box <?php echo isset($modalType) ? $modalType : ''; ?>">
-      <button class="close-btn" onclick="closeModal()">&times;</button>
-      <span id="modalMessage"><?php echo isset($modalMessage) ? htmlspecialchars($modalMessage) : ''; ?></span>
-    </div>
-  </div>
-
-  <script>
-  function closeModal() {
-    document.getElementById('modalOverlay').classList.remove('show');
-  }
-  // Auto-show modal if PHP sets it
-  <?php if (!empty($showModal)): ?>
-    document.addEventListener('DOMContentLoaded', function() {
-      document.getElementById('modalOverlay').classList.add('show');
-    });
-  <?php endif; ?>
-  </script>
-
 </main>
 
 </body>

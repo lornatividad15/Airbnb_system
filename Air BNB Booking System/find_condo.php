@@ -42,7 +42,7 @@ $guests = isset($_GET['guest_count']) ? (int)$_GET['guest_count'] : '';
           </div>
         </div>
       <?php else: ?>
-        <a href="signup form.php" id="signup">Sign Up</a>
+        <a href="signup_form.php" id="signup">Sign Up</a>
         <a href="Login form.php" id="login">Login</a>
       <?php endif; ?>
     </div>
@@ -72,7 +72,7 @@ $guests = isset($_GET['guest_count']) ? (int)$_GET['guest_count'] : '';
   <?php else: ?>
     <div class="mobile-nav-section" id="mobileAuthMenu">
       <h4>Account</h4>
-      <a href="signup form.php" id="mobileSignup">Sign Up</a>
+      <a href="signup_form.php" id="mobileSignup">Sign Up</a>
       <a href="Login form.php" id="mobileLogin">Login</a>
     </div>
   <?php endif; ?>

@@ -25,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
 
     $check->close();
 
-    header("Location: edit_condo.php?id=$condo_id");
+    // Redirect with modal feedback
+    header("Location: edit_condo.php?id=$condo_id&img_deleted=1");
     exit;
 }
 ?>

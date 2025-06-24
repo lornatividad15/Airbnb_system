@@ -45,37 +45,59 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
   <meta charset="UTF-8" />
   <title>Confirm Account Deletion</title>
   <link rel="stylesheet" href="CSS/delete_account.css">
-  <script src="JS/delete_account.js" defer></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
   <form method="post" class="modal-box">
     <h2>Delete Account</h2>
     <p>Please confirm your identity to permanently delete your account.</p>
-
     <input type="text" name="confirm_identifier" placeholder="Email or Username" required>
     <div class="password-wrapper">
       <input type="password" id="confirmPassword" name="confirm_password" placeholder="Password" required>
-      <span class="toggle-password" onclick="togglePassword('confirmPassword', this)">👁️</span>
+      <span class="toggle-password" onclick="togglePassword('confirmPassword', this)"><i class="fa-regular fa-eye"></i></span>
     </div>
-
     <button type="submit">Delete Account</button>
-    <a href="profile_form.php" class="cancel">Cancel</a>
-
+    <a href="profile.php" class="cancel">Cancel</a>
     <?php if (isset($_SESSION['delete_error'])): ?>
       <p class="error-msg"><?php echo $_SESSION['delete_error']; unset($_SESSION['delete_error']); ?></p>
     <?php endif; ?>
   </form>
-
   <script>
     function togglePassword(fieldId, icon) {
       const pwdInput = document.getElementById(fieldId);
+      const eye = icon.querySelector('i');
       if (pwdInput.type === 'password') {
         pwdInput.type = 'text';
-        icon.textContent = '🙈';
+        eye.classList.remove('fa-eye');
+        eye.classList.add('fa-eye-slash');
       } else {
         pwdInput.type = 'password';
-        icon.textContent = '👁️';
+        eye.classList.remove('fa-eye-slash');
+        eye.classList.add('fa-eye');
       }
+    }
+    // Show modal if account deleted (from ?deleted=1 in URL)
+    window.addEventListener('DOMContentLoaded', function() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('deleted') === '1') {
+        showDeleteModal();
+      }
+    });
+    function showDeleteModal() {
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal-message-box">
+          <span class="close-modal" onclick="this.closest('.modal-overlay').remove()">&times;</span>
+          <div class="modal-success-icon"><i class='fa-solid fa-check-circle'></i></div>
+          <div class="modal-success-text">Account deleted successfully.</div>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      setTimeout(() => {
+        if (modal.parentNode) modal.remove();
+        window.location.href = 'Login form.php';
+      }, 3000);
     }
   </script>
 </body>

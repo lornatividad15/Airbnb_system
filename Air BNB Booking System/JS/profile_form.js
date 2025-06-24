@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function () {
   const profileForm = document.getElementById('profileForm');
   const profileImg = document.getElementById('profileImg');
   const profileUpload = document.getElementById('profileUpload');
-  const profileDropdown = document.getElementById('profileDropdown');
   const currentEmail = document.querySelector('input[name="email"]');
   const newEmail = document.querySelector('input[name="new_email"]');
   const confirmEmail = document.querySelector('input[name="confirm_email"]');
@@ -10,49 +9,72 @@ document.addEventListener('DOMContentLoaded', function () {
   const newPassword = document.getElementById('newPassword');
   const confirmPassword = document.getElementById('confirmPassword');
 
-  const modalOverlay = document.getElementById('modalOverlay');
-  const modalBox = document.getElementById('modalBox');
-  const modalMessage = document.getElementById('modalMessage');
-  const modalCloseBtn = document.getElementById('modalCloseBtn');
-  const modalActions = document.getElementById('modalActions');
-  const modalConfirmBtn = document.getElementById('modalConfirmBtn');
-  const modalCancelBtn = document.getElementById('modalCancelBtn');
+  // --- Modal logic (works for both PHP + JS triggered feedback) ---
+  const modalOverlay = document.getElementById("modalOverlay");
+  const modalBox = document.getElementById("modalBox");
+  const modalMessage = document.getElementById("modalMessage");
+  const modalCloseBtn = document.getElementById("modalCloseBtn");
 
-  function showModal(message, mode = "ok-only", callback = null) {
-    modalMessage.innerHTML = message;
-    modalCloseBtn.style.display = mode === "ok-only" ? "inline-block" : "none";
-    modalActions.style.display = mode === "ok-only" ? "none" : "flex";
-    modalOverlay.style.display = "flex";
-
-    modalConfirmBtn.onclick = () => {
-      if (callback) callback();
-      modalOverlay.style.display = "none";
-    };
-    modalCancelBtn.onclick = modalCloseBtn.onclick = () => {
-      modalOverlay.style.display = "none";
-    };
-
-    modalBox.style.border = message.includes('❌') ? '2px solid #e74c3c' :
-                             message.includes('✅') ? '2px solid #2ecc71' : 'none';
+  function closeModal(e) {
+    if (e) e.preventDefault();
+    modalOverlay.style.display = 'none';
+    modalOverlay.classList.remove('show');
+    if (window.modalTimeout) clearTimeout(window.modalTimeout);
   }
 
-  window.showModal = showModal;
+  if (modalOverlay && modalBox && modalMessage && modalCloseBtn) {
+    modalCloseBtn.onclick = closeModal;
+    modalOverlay.onclick = function (e) {
+      if (e.target === modalOverlay) closeModal();
+    };
 
-  profileImg.addEventListener('click', () => {
-    profileDropdown.style.display = profileDropdown.style.display === 'block' ? 'none' : 'block';
-  });
-
-  document.addEventListener('click', function (e) {
-    if (!profileImg.contains(e.target) && !profileDropdown.contains(e.target)) {
-      profileDropdown.style.display = 'none';
+    if (modalOverlay.classList.contains('show')) {
+      modalOverlay.style.display = 'flex';
+      window.modalTimeout = setTimeout(closeModal, 3000);
     }
-  });
 
-  document.getElementById('showProfilePic').addEventListener('click', () => {
-    profileDropdown.style.display = 'none';
-    showModal(`<img src="${profileImg.src}" style="width:100%;max-width:300px;border-radius:12px;" />`);
-  });
+    window.showModal = function (message, type = 'error') {
+      modalBox.className = 'modal-box ' + type;
+      modalMessage.textContent = message;
+      modalOverlay.style.display = 'flex';
+      modalOverlay.classList.add('show');
+      if (window.modalTimeout) clearTimeout(window.modalTimeout);
+      window.modalTimeout = setTimeout(closeModal, 3000);
+    };
+  }
 
+  // --- Profile image click to open modal viewer ---
+  const viewerModal = document.getElementById('imageViewerModal');
+  const viewerImgModal = document.getElementById('viewerImageModal');
+  const closeViewerModalBtn = document.getElementById('closeViewerModalBtn');
+
+  if (profileImg && viewerModal && viewerImgModal && closeViewerModalBtn) {
+    profileImg.onclick = function (e) {
+      e.preventDefault();
+      viewerImgModal.src = profileImg.src;
+      viewerModal.style.display = 'flex';
+    };
+
+    closeViewerModalBtn.onclick = function (e) {
+      e.preventDefault();
+      viewerModal.style.display = 'none';
+    };
+
+    viewerModal.onclick = function (e) {
+      if (e.target === viewerModal) viewerModal.style.display = 'none';
+    };
+  }
+
+  // --- Pen icon triggers file input ---
+  const editProfilePicBtn = document.getElementById('editProfilePicBtn');
+  if (editProfilePicBtn && profileUpload) {
+    editProfilePicBtn.onclick = function (e) {
+      e.preventDefault();
+      profileUpload.click();
+    };
+  }
+
+  // --- Profile picture preview on upload ---
   profileUpload.addEventListener('change', function () {
     const file = this.files[0];
     if (file) {
@@ -64,47 +86,58 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   });
 
-  profileForm.addEventListener('submit', function (e) {
-    if (newPassword.value && !currentPassword.value) {
-      e.preventDefault();
-      showModal("❌ Please enter your current password to set a new one.");
-      return;
-    }
-
-    if (newEmail.value && newEmail.value === currentEmail.value) {
-      e.preventDefault();
-      showModal("❌ New email must be different from your current email.");
-      return;
-    }
-
-    if (newEmail.value && newEmail.value !== confirmEmail.value) {
-      e.preventDefault();
-      showModal("❌ New email and confirm email do not match.");
-      return;
-    }
-
-    if (newPassword.value && newPassword.value === currentPassword.value) {
-      e.preventDefault();
-      showModal("❌ New password must be different from your current password.");
-      return;
-    }
-
-    if (newPassword.value && newPassword.value !== confirmPassword.value) {
-      e.preventDefault();
-      showModal("❌ New password and confirm password do not match.");
-      return;
-    }
-  });
-
-  function togglePassword(id) {
+  // --- Password visibility toggle ---
+  window.togglePassword = function (id) {
     const input = document.getElementById(id);
     if (input.type === 'password') {
       input.type = 'text';
     } else {
       input.type = 'password';
     }
-  }
+  };
 
+  // --- Form validation before submission ---
+  profileForm.addEventListener('submit', function (e) {
+    function showValidationModal(msg) {
+      if (typeof showModal === 'function') {
+        showModal(msg, 'error');
+      } else {
+        alert(msg);
+      }
+    }
+
+    if (newEmail.value.trim() && newEmail.value.trim() === currentEmail.value.trim()) {
+      e.preventDefault();
+      showValidationModal("❌ New email must be different from your current email.");
+      return;
+    }
+
+    if (newPassword.value && !currentPassword.value) {
+      e.preventDefault();
+      showValidationModal("❌ Please enter your current password to set a new one.");
+      return;
+    }
+
+    if (newEmail.value && newEmail.value !== confirmEmail.value) {
+      e.preventDefault();
+      showValidationModal("❌ New email and confirm email do not match.");
+      return;
+    }
+
+    if (newPassword.value && newPassword.value === currentPassword.value) {
+      e.preventDefault();
+      showValidationModal("❌ New password must be different from your current password.");
+      return;
+    }
+
+    if (newPassword.value && newPassword.value !== confirmPassword.value) {
+      e.preventDefault();
+      showValidationModal("❌ New password and confirm password do not match.");
+      return;
+    }
+  });
+
+  // --- Account delete button ---
   const deleteBtn = document.getElementById('deleteBtn');
   if (deleteBtn) {
     deleteBtn.addEventListener('click', function () {

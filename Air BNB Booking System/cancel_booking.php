@@ -21,11 +21,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    // Cancel the booking
+    // Set status to pending_cancel instead of cancelled
     $reasonEscaped = $conn->real_escape_string($reason);
     $updateSql = "
         UPDATE bookings
-        SET status = 'cancelled',
+        SET status = 'pending_cancel',
             cancellation_reason = '$reasonEscaped'
         WHERE id = $bookingId AND user_id = $userId
     ";

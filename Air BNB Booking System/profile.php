@@ -137,82 +137,110 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_profile'])) {
     </a>
   </div>
 </header>
-<main class="profile-container">
-  <form id="profileForm" method="post" enctype="multipart/form-data">
-    <h1 class="profile-title">MY PROFILE</h1>
-    <?php if ($success) {
-      echo '<link rel="stylesheet" href="CSS/modal_global.css" />';
-      echo '<div id="modalOverlay" class="modal-overlay show">';
-      echo '<div class="modal-box success">';
-      echo '<button class="close-btn" onclick="closeModal()">&times;</button>';
-      echo '<span id="modalMessage">' . htmlspecialchars($success) . '</span>';
-      echo '</div></div>';
-      echo '<script>function closeModal(){document.getElementById("modalOverlay").classList.remove("show");}document.addEventListener("DOMContentLoaded",function(){document.getElementById("modalOverlay").classList.add("show");setTimeout(closeModal,3000);});</script>';
-  } ?>
-    <?php if ($error) {
-      echo '<link rel="stylesheet" href="CSS/modal_global.css" />';
-      echo '<div id="modalOverlay" class="modal-overlay show">';
-      echo '<div class="modal-box error">';
-      echo '<button class="close-btn" onclick="closeModal()">&times;</button>';
-      echo '<span id="modalMessage">' . htmlspecialchars($error) . '</span>';
-      echo '</div></div>';
-      echo '<script>function closeModal(){document.getElementById("modalOverlay").classList.remove("show");}document.addEventListener("DOMContentLoaded",function(){document.getElementById("modalOverlay").classList.add("show");setTimeout(closeModal,3000);});</script>';
-  } ?>
-    <div class="profile-picture">
-      <img 
-        src="<?php echo !empty($user['profile_picture']) 
-          ? 'data:image/jpeg;base64,' . base64_encode($user['profile_picture']) 
-          : 'Images/profile_logo.png'; ?>" 
-        id="profileImg" alt="Profile Picture">
-      <input type="file" id="profileUpload" name="profile_picture" accept="image/*">
-    </div>
-    <div class="profile-dropdown" id="profileDropdown">
-      <button type="button" id="showProfilePic">SHOW PROFILE PICTURE</button>
-      <label for="profileUpload" id="changeProfilePic">CHANGE PROFILE PICTURE</label>
-    </div>
-    <div class="form-group"><label>First Name</label>
-      <input type="text" name="firstname" value="<?= htmlspecialchars($user['firstname']) ?>" required></div>
-    <div class="form-group"><label>Last Name</label>
-      <input type="text" name="lastname" value="<?= htmlspecialchars($user['lastname']) ?>" required></div>
-    <div class="form-group"><label>Current Email</label>
-      <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" readonly style="background:#f5f5f5;pointer-events:none;" tabindex="-1"></div>
-    <div class="form-group"><label>Username</label>
-      <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required></div>
-    <div class="form-group"><label>Phone Number</label>
-      <input type="text" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>"></div>
-    <div class="form-group"><label>Birthdate</label>
-      <input type="date" id="birthdate" name="birthdate" max="<?= date('Y-m-d', strtotime('-1 day')) ?>" value="<?= htmlspecialchars($user['birthdate']) ?>"></div>
-    <div class="form-group"><label>Age</label>
-      <input type="number" id="age" name="age" value="<?= htmlspecialchars($user['age']) ?>" required></div>
-    <hr><h2 class="section-title">Change Email</h2>
-    <div class="form-group"><label>New Email</label><input type="email" name="new_email"></div>
-    <div class="form-group"><label>Confirm New Email</label><input type="email" name="confirm_email"></div>
-    <hr><h2 class="section-title">Change Password</h2>
-    <div class="form-group password-field">
-      <label>Current Password</label>
-      <input type="password" id="currentPassword" name="current_password">
-      <span class="toggle-password" onclick="togglePassword('currentPassword')">&#128065;</span>
-    </div>
-    <div class="form-group password-field">
-      <label>New Password</label>
-      <input type="password" id="newPassword" name="new_password">
-      <span class="toggle-password" onclick="togglePassword('newPassword')">&#128065;</span>
-    </div>
-    <div class="form-group password-field">
-      <label>Confirm New Password</label>
-      <input type="password" id="confirmPassword" name="confirm_password">
-      <span class="toggle-password" onclick="togglePassword('confirmPassword')">&#128065;</span>
-    </div>
-    <input type="hidden" name="update_profile" value="1">
-    <button type="submit">Save Changes</button>
-    <button type="button" class="delete-button" id="deleteBtn">Delete Account</button>
-  </form>
+<main class="profile-wrapper">
+  <div class="profile-container">
+    <form id="profileForm" method="post" enctype="multipart/form-data">
+      <h1 class="profile-title">MY PROFILE</h1>
+      <div id="modalOverlay" class="modal-overlay" style="display:none;">
+        <div class="modal-box" id="modalBox">
+          <button type="button" class="close-btn" id="modalCloseBtn">&times;</button>
+          <span id="modalMessage"></span>
+        </div>
+      </div>
+      <?php if ($success || $error): ?>
+      <script>
+        document.addEventListener("DOMContentLoaded", function () {
+          const modalOverlay = document.getElementById("modalOverlay");
+          const modalBox = document.getElementById("modalBox");
+          const modalMessage = document.getElementById("modalMessage");
+          const modalType = <?= json_encode($success ? 'success' : 'error') ?>;
+          const modalText = <?= json_encode($success ?: $error) ?>;
+          if (modalOverlay && modalBox && modalMessage) {
+            modalBox.className = 'modal-box ' + modalType;
+            modalMessage.textContent = modalText;
+            modalOverlay.classList.add('show');
+            modalOverlay.style.display = 'flex';
+          }
+        });
+      </script>
+      <?php endif; ?>
+      <div class="profile-picture">
+        <img 
+          src="<?php echo !empty($user['profile_picture']) 
+            ? 'data:image/jpeg;base64,' . base64_encode($user['profile_picture']) 
+            : 'Images/profile_logo.png'; ?>" 
+          id="profileImg" alt="Profile Picture" style="cursor:pointer;">
+        <input type="file" id="profileUpload" name="profile_picture" accept="image/*" style="display:none;">
+        <button type="button" id="editProfilePicBtn" title="Change Profile Picture">
+          <span style="color:white;font-size:18px;" class="fa fa-pen"></span>
+        </button>
+      </div>
+      <div class="form-group"><label>First Name</label>
+        <input type="text" name="firstname" value="<?= htmlspecialchars($user['firstname']) ?>" required></div>
+      <div class="form-group"><label>Last Name</label>
+        <input type="text" name="lastname" value="<?= htmlspecialchars($user['lastname']) ?>" required></div>
+      <div class="form-group"><label>Current Email</label>
+        <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" readonly style="background:#f5f5f5;pointer-events:none;" tabindex="-1"></div>
+      <div class="form-group"><label>Username</label>
+        <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required></div>
+      <div class="form-group"><label>Phone Number</label>
+        <input type="text" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>"></div>
+      <div class="form-group"><label>Birthdate</label>
+        <input type="date" id="birthdate" name="birthdate" max="<?= date('Y-m-d', strtotime('-1 day')) ?>" value="<?= htmlspecialchars($user['birthdate']) ?>"></div>
+      <div class="form-group"><label>Age</label>
+        <input type="number" id="age" name="age" value="<?= htmlspecialchars($user['age']) ?>" required></div>
+      <div class="form-group"><label>Sex</label>
+        <select name="sex" required>
+          <option value="Male" <?php echo ($user['sex']==='Male')?'selected':''; ?>>Male</option>
+          <option value="Female" <?php echo ($user['sex']==='Female')?'selected':''; ?>>Female</option>
+          <option value="Other" <?php echo ($user['sex']==='Other')?'selected':''; ?>>Other</option>
+        </select>
+      </div>
+      <hr><h2 class="section-title">Change Email</h2>
+      <div class="form-group"><label>New Email</label><input type="email" name="new_email"></div>
+      <div class="form-group"><label>Confirm New Email</label><input type="email" name="confirm_email"></div>
+      <hr><h2 class="section-title">Change Password</h2>
+      <div class="form-group password-field">
+        <label>Current Password</label>
+        <input type="password" id="currentPassword" name="current_password">
+        <span class="toggle-password" onclick="togglePassword('currentPassword')">&#128065;</span>
+      </div>
+      <div class="form-group password-field">
+        <label>New Password</label>
+        <input type="password" id="newPassword" name="new_password">
+        <span class="toggle-password" onclick="togglePassword('newPassword')">&#128065;</span>
+      </div>
+      <div class="form-group password-field">
+        <label>Confirm New Password</label>
+        <input type="password" id="confirmPassword" name="confirm_password">
+        <span class="toggle-password" onclick="togglePassword('confirmPassword')">&#128065;</span>
+      </div>
+      <input type="hidden" name="update_profile" value="1">
+      <button type="submit">Save Changes</button>
+      <button type="button" class="delete-button" id="deleteBtn">Delete Account</button>
+    </form>
+  </div>
 </main>
-<div class="modal-overlay" id="modalOverlay">
+<!-- Only one modal overlay in the DOM -->
+<div class="modal-overlay" id="modalOverlay" style="display:none;">
+  <div class="modal-box" id="modalBox">
+    <button type="button" class="close-btn" id="modalCloseBtn">&times;</button>
+    <span id="modalMessage"></span>
+  </div>
+</div>
+<!-- Profile Picture Image Viewer Modal (centered popout) -->
+<div id="imageViewerModal" class="image-viewer-modal" style="display:none;position:fixed;z-index:1000;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.7);justify-content:center;align-items:center;">
+  <span class="close-viewer" id="closeViewerModalBtn" style="position:absolute;top:32px;right:48px;font-size:2.5rem;color:white;cursor:pointer;">&times;</span>
+  <img id="viewerImageModal" src="" alt="Profile Picture" style="max-width:90vw;max-height:80vh;border-radius:16px;box-shadow:0 4px 32px rgba(0,0,0,0.4);display:block;">
 </div>
 <script src="JS/profile_form.js"></script>
+<!-- Profile Picture Bottom Sheet Viewer -->
+<div id="imageViewerBottom" class="image-viewer-bottom" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:1000;background:rgba(255,255,255,0.98);box-shadow:0 -2px 16px rgba(0,0,0,0.2);padding:24px 0 16px 0;text-align:center;">
+  <span class="close-viewer" id="closeViewerBottomBtn" style="position:absolute;top:8px;right:24px;font-size:2rem;cursor:pointer;">&times;</span>
+  <img id="viewerImageBottom" src="" alt="Profile Picture">
+</div>
 <script>
-// Improved Birthdate/Age logic
+  // --- Birthdate/Age logic (untouched) ---
   document.addEventListener('DOMContentLoaded', function () {
     const birthInput = document.getElementById('birthdate');
     const ageInput = document.getElementById('age');

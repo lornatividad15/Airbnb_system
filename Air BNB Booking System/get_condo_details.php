@@ -37,6 +37,14 @@ $condo_result = $condo_stmt->get_result();
 $condo = $condo_result->fetch_assoc();
 $condo_stmt->close();
 
+// Fetch bookings for this condo
+$bookings_sql = "SELECT b.*, u.username, u.firstname, u.lastname, u.email, u.phone_number FROM bookings b JOIN users u ON b.user_id = u.id WHERE b.condo_id = ? ORDER BY b.checkin DESC";
+$bookings_stmt = $conn->prepare($bookings_sql);
+$bookings_stmt->bind_param("i", $condo_id);
+$bookings_stmt->execute();
+$bookings_result = $bookings_stmt->get_result();
+$bookings_stmt->close();
+
 if ($condo):
 ?>
 
@@ -56,6 +64,24 @@ if ($condo):
   <p><strong>Day/s Use:</strong> <?= $total_days ?></p>
   <p><strong>Earliest Check-in:</strong> <?= $check_in ?></p>
   <p><strong>Latest Check-out:</strong> <?= $check_out ?></p>
+</div>
+
+<div class="condo-users-box">
+  <h3>Users Who Booked This Condo</h3>
+  <?php if ($bookings_result->num_rows > 0): ?>
+    <div class="condo-bookings-list">
+      <?php while ($b = $bookings_result->fetch_assoc()): ?>
+        <div class="condo-booking-entry">
+          <p><strong>User:</strong> <?= htmlspecialchars($b['firstname'] . ' ' . $b['lastname']) ?> (<?= htmlspecialchars($b['username']) ?>)</p>
+          <p><strong>Email:</strong> <?= htmlspecialchars($b['email']) ?> | <strong>Phone:</strong> <?= htmlspecialchars($b['phone_number']) ?></p>
+          <p><strong>Check-in:</strong> <?= date('M d, Y - h:i A', strtotime($b['checkin'])) ?> | <strong>Check-out:</strong> <?= date('M d, Y - h:i A', strtotime($b['checkout'])) ?></p>
+          <p><strong>Status:</strong> <?= htmlspecialchars($b['status']) ?></p>
+        </div>
+      <?php endwhile; ?>
+    </div>
+  <?php else: ?>
+    <p>No bookings for this condo yet.</p>
+  <?php endif; ?>
 </div>
 
 <?php

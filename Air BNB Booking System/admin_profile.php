@@ -21,38 +21,95 @@ $current_username = $admin['username'];
 $current_password = $admin['password'];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $new_admin_id = $_POST['admin_id'] ?? $current_admin_id;
-    $new_username = $_POST['username'] ?? $current_username;
+    $new_admin_id = isset($_POST['admin_id']) && $_POST['admin_id'] !== '' ? $_POST['admin_id'] : $current_admin_id;
+    $new_username = isset($_POST['username']) && $_POST['username'] !== '' ? $_POST['username'] : $current_username;
     $current_password_input = $_POST['current_password'] ?? '';
     $new_password = $_POST['new_password'] ?? '';
 
-    if (!empty($current_password_input) || !empty($new_password)) {
+    // Only validate admin_id if it is being changed
+    if ($new_admin_id !== $current_admin_id) {
+        // Check in admins table (exclude self)
+        $stmt = $conn->prepare("SELECT admin_id FROM admins WHERE admin_id = ? AND admin_id != ?");
+        $stmt->bind_param("ss", $new_admin_id, $current_admin_id);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $error = "Admin ID already exists. Please choose another.";
+        }
+        $stmt->close();
+    }
+
+    // Only validate username if it is being changed
+    if (!$error && $new_username !== $current_username) {
+        // Check in users table
+        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ?");
+        $stmt->bind_param("s", $new_username);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $error = "Username already exists in users. Please choose another.";
+        }
+        $stmt->close();
+        // Check in admins table (exclude self)
+        if (empty($error)) {
+            $stmt = $conn->prepare("SELECT admin_id FROM admins WHERE username = ? AND admin_id != ?");
+            $stmt->bind_param("ss", $new_username, $current_admin_id);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                $error = "Username already exists in admins. Please choose another.";
+            }
+            $stmt->close();
+        }
+    }
+
+    // Only validate password if a new password is provided
+    if (!$error && (!empty($current_password_input) || !empty($new_password))) {
         if (hash('sha256', $current_password_input) !== $current_password) {
             $error = "Current password is incorrect.";
         } elseif (hash('sha256', $new_password) === $current_password) {
             $error = "New password cannot be the same as the old password.";
-        } elseif (!empty($new_password)) {
-            $hashed_new = hash('sha256', $new_password);
-            $stmt = $conn->prepare("UPDATE admins SET admin_id = ?, username = ?, password = ? WHERE admin_id = ?");
-            $stmt->bind_param("ssss", $new_admin_id, $new_username, $hashed_new, $admin_id);
         }
     }
 
     if (empty($error)) {
-        if (empty($new_password)) {
-            $stmt = $conn->prepare("UPDATE admins SET admin_id = ?, username = ? WHERE admin_id = ?");
-            $stmt->bind_param("sss", $new_admin_id, $new_username, $admin_id);
+        // Build update query dynamically
+        $fields = [];
+        $params = [];
+        $types = '';
+        if ($new_admin_id !== $current_admin_id) {
+            $fields[] = 'admin_id = ?';
+            $params[] = $new_admin_id;
+            $types .= 's';
         }
-
-        if ($stmt->execute()) {
-            $_SESSION['admin_id'] = $new_admin_id;
-            $_SESSION['admin_username'] = $new_username;
-            $success = "Profile updated successfully.";
-            $admin_id = $new_admin_id;
+        if ($new_username !== $current_username) {
+            $fields[] = 'username = ?';
+            $params[] = $new_username;
+            $types .= 's';
+        }
+        if (!empty($new_password)) {
+            $fields[] = 'password = ?';
+            $params[] = hash('sha256', $new_password);
+            $types .= 's';
+        }
+        if (!empty($fields)) {
+            $params[] = $current_admin_id;
+            $types .= 's';
+            $sql = "UPDATE admins SET ".implode(', ', $fields)." WHERE admin_id = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param($types, ...$params);
+            if ($stmt->execute()) {
+                if ($new_admin_id !== $current_admin_id) $_SESSION['admin_id'] = $new_admin_id;
+                if ($new_username !== $current_username) $_SESSION['admin_username'] = $new_username;
+                $success = "Profile updated successfully.";
+                $admin_id = $new_admin_id;
+            } else {
+                $error = "Failed to update profile.";
+            }
+            $stmt->close();
         } else {
-            $error = "Failed to update profile.";
+            $success = "No changes made.";
         }
-        $stmt->close();
     }
 
     $stmt = $conn->prepare("SELECT admin_id, username, password, created_at FROM admins WHERE admin_id = ?");
@@ -112,11 +169,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <?php endif; ?>
 
     <form method="POST" class="profile-form">
-      <label for="admin_id">Admin ID</label>
-      <input type="text" id="admin_id" name="admin_id" value="<?= htmlspecialchars($admin['admin_id']) ?>" required>
+      <label for="current_admin_id">Current Admin ID</label>
+      <input type="text" id="current_admin_id" name="current_admin_id" value="<?= htmlspecialchars($admin['admin_id']) ?>" disabled>
 
-      <label for="username">Username</label>
-      <input type="text" id="username" name="username" value="<?= htmlspecialchars($admin['username']) ?>" required>
+      <label for="admin_id">New Admin ID</label>
+      <input type="text" id="admin_id" name="admin_id" placeholder="Enter new admin ID" value="">
+
+      <label for="current_username">Current Username</label>
+      <input type="text" id="current_username" name="current_username" value="<?= htmlspecialchars($admin['username']) ?>" disabled>
+
+      <label for="username">New Username</label>
+      <input type="text" id="username" name="username" placeholder="Enter new username" value="">
 
       <label for="current_password">Current Password</label>
       <div class="password-wrapper">
