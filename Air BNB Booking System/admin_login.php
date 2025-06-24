@@ -2,6 +2,11 @@
 session_start();
 include 'config.php';
 
+function setModal($message, $type = 'error') {
+    $_SESSION['modal_message'] = $message;
+    $_SESSION['modal_type'] = $type;
+}
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $admin_id = $_POST['admin_id'] ?? '';
     $username = $_POST['username'] ?? '';
@@ -21,10 +26,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             header("Location: admin_page.php"); 
             exit();
         } else {
-            echo "<script>alert('Incorrect password.'); window.history.back();</script>";
+            setModal('Incorrect password.', 'error');
+            header("Location: admin_loginform.php");
+            exit;
         }
     } else {
-        echo "<script>alert('Admin ID or Username not found.'); window.history.back();</script>";
+        setModal('Admin ID or Username not found.', 'error');
+        header("Location: admin_loginform.php");
+        exit;
     }
 
     $stmt->close();

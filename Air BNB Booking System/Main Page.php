@@ -32,7 +32,7 @@ $isAdmin = isset($_SESSION['admin_id']);
         <div class="user-menu" id="userMenu">
           <span id="accountName">My Account</span>
           <div class="dropdown" id="userDropdown">
-            <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile_form.php' ?>">Profile</a>
+            <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile.php' ?>">Profile</a>
             <a href="logout.php" id="logoutBtn">Logout</a>
           </div>
         </div>
@@ -62,7 +62,7 @@ $isAdmin = isset($_SESSION['admin_id']);
   <?php if ($isLoggedIn || $isAdmin): ?>
     <div class="mobile-nav-section" id="mobileUserMenu">
       <h4>My Account</h4>
-      <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile_form.php' ?>" id="mobileProfile">Profile</a>
+      <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile.php' ?>" id="mobileProfile">Profile</a>
       <a href="logout.php" id="mobileLogoutBtn">Logout</a>
     </div>
   <?php else: ?>
@@ -80,6 +80,16 @@ $isAdmin = isset($_SESSION['admin_id']);
 </nav>
 
 <?php include 'search_form.php'; ?>
+
+<section class="feature-section">
+  <div class="feature-image">
+    <img src="Images/logo-dark-transparent.png" alt="Why Book With Us">
+  </div>
+  <div class="feature-description">
+    <h2>Why Everyone Books</h2>
+    <p>TRAVEL, EAT AND SLEEP is your go-to website for discovering and booking the best Airbnb stays across the Philippines. From cozy city condos to scenic beachside retreats, we make travel planning easy, affordable, and unforgettable. With real-time availability, secure reservations, and a wide selection of unique homes, we connect travelers to trusted hosts in top destinations—ensuring comfort, adventure, and a place that feels like home, wherever you go.</p>
+  </div>
+</section>
 
 <section class="condos">
   <div class="condo-header">

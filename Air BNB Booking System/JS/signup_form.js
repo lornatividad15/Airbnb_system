@@ -64,16 +64,14 @@ document.addEventListener('DOMContentLoaded', function () {
   };
 });
 
-window.togglePassword = function (fieldId, icon) {
-  const input = document.getElementById(fieldId);
-  if (input.type === "password") {
-    input.type = "text";
-    icon.textContent = "🙈";
+function togglePassword(id) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') {
+    input.type = 'text';
   } else {
-    input.type = "password";
-    icon.textContent = "👁️";
+    input.type = 'password';
   }
-};
+}
 
 window.toggleProfileOptions = function () {
   const options = document.getElementById('profileOptions');

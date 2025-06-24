@@ -27,6 +27,7 @@ if ($result && $result->num_rows > 0) {
 ?>
 
 <link rel="stylesheet" href="CSS/search_form.css">
+<link rel="stylesheet" href="CSS/modal_global.css">
 
 <div class="search-container">
   <form action="find_condo.php" method="get">
@@ -64,14 +65,28 @@ if ($result && $result->num_rows > 0) {
 </div>
 
 <div id="bookingModal" class="modal-overlay">
-  <div class="modal-box">
-    <span class="close-btn" id="closeModalBtn">&times;</span>
-    <p id="modalMessage">Placeholder message</p>
+  <div class="modal-box" id="modalBox">
+    <button class="close-btn" id="closeModalBtn">&times;</button>
+    <span id="modalMessage">Placeholder message</span>
   </div>
 </div>
 
 <script>
   const bookedRanges = <?= json_encode($bookedDates); ?>;
+  function showModal(message, type = '') {
+    const modal = document.getElementById('bookingModal');
+    const modalMsg = document.getElementById('modalMessage');
+    const modalBox = document.getElementById('modalBox');
+    modalMsg.textContent = message;
+    modalBox.className = 'modal-box ' + (type ? type : '');
+    modal.classList.add('show');
+    setTimeout(() => {
+      modal.classList.remove('show');
+    }, 3000);
+  }
+  document.getElementById('closeModalBtn').onclick = function() {
+    document.getElementById('bookingModal').classList.remove('show');
+  };
 </script>
 
 <script src="JS/search_form.js"></script>

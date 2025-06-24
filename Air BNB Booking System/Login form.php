@@ -1,20 +1,5 @@
 <?php
 session_start();
-$modalScript = '';
-if (isset($_SESSION['modal_message'])) {
-    $modalScript = "<script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const modal = document.getElementById('modal');
-            const modalMsg = document.getElementById('modal-message');
-            modalMsg.textContent = " . json_encode($_SESSION['modal_message']) . ";
-            modal.classList.add('show');
-            setTimeout(() => {
-                modal.classList.remove('show');
-            }, 3000);
-        });
-    </script>";
-    unset($_SESSION['modal_message']);
-}
 ?>
 
 <!DOCTYPE html>
@@ -23,11 +8,10 @@ if (isset($_SESSION['modal_message'])) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <link rel="stylesheet" href="CSS/Login form.css" />
+  <link rel="stylesheet" href="CSS/modal_global.css" />
   <title>Login</title>
 </head>
 <body>
-
-  <?= $modalScript ?>
 
   <header>
     <div class="header-inner">
@@ -48,7 +32,7 @@ if (isset($_SESSION['modal_message'])) {
         <label for="password">Password</label>
         <div class="password-wrapper">
           <input type="password" id="password" name="password" placeholder="Enter password" required />
-          <span class="toggle-password" onclick="togglePassword()">👁️</span>
+          <span class="toggle-password" onclick="togglePassword('password')">&#128065;</span>
         </div>
 
         <button type="submit" class="login-btn">Login</button> 
@@ -62,24 +46,39 @@ if (isset($_SESSION['modal_message'])) {
   </main>
 
   <div id="modal" class="modal-overlay">
-    <div class="modal-box">
-      <span class="close-btn" onclick="document.getElementById('modal').classList.remove('show')">&times;</span>
-      <p id="modal-message"></p>
+    <div class="modal-box" id="modalBox">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <span id="modal-message"></span>
     </div>
   </div>
 
   <script>
-    function togglePassword() {
-      const pwdInput = document.getElementById("password");
-      const toggleBtn = document.querySelector(".toggle-password");
+    function togglePassword(fieldId) {
+      const pwdInput = document.getElementById(fieldId);
+      const icon = event.currentTarget;
       if (pwdInput.type === "password") {
         pwdInput.type = "text";
-        toggleBtn.textContent = "🙈";
+        icon.innerHTML = "&#128564;"; // Unicode for eye with slash
       } else {
         pwdInput.type = "password";
-        toggleBtn.textContent = "👁️";
+        icon.innerHTML = "&#128065;"; // Unicode for eye
       }
     }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+    <?php if (isset($_SESSION['modal_message'])): ?>
+      document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('modal');
+        const modalMsg = document.getElementById('modal-message');
+        modalMsg.textContent = <?php echo json_encode($_SESSION['modal_message']); ?>;
+        modal.classList.add('show');
+        setTimeout(() => {
+          modal.classList.remove('show');
+        }, 3000);
+      });
+    <?php unset($_SESSION['modal_message']); endif; ?>
   </script>
 
 </body>

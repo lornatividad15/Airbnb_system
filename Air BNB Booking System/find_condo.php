@@ -29,7 +29,7 @@ $guests = isset($_GET['guest_count']) ? (int)$_GET['guest_count'] : '';
 
     <div class="center-nav">
       <a href="find_condo.php">Find a Condo</a>
-      <a href="#" id="myBookingsLink">My Bookings</a>
+      <a href="Booking.php" id="myBookingsLink">My Bookings</a>
     </div>
 
     <div class="right-nav">
@@ -37,7 +37,7 @@ $guests = isset($_GET['guest_count']) ? (int)$_GET['guest_count'] : '';
         <div class="user-menu" id="userMenu">
           <span id="accountName">My Account</span>
           <div class="dropdown" id="userDropdown">
-            <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile_form.php' ?>">Profile</a>
+            <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile.php' ?>">Profile</a>
             <a href="logout.php" id="logoutBtn">Logout</a>
           </div>
         </div>
@@ -60,13 +60,13 @@ $guests = isset($_GET['guest_count']) ? (int)$_GET['guest_count'] : '';
 <nav class="mobile-nav" id="mobileNav">
   <div class="mobile-nav-section" id="mobileNavLinks">
     <a href="find_condo.php">Find a Condo</a>
-    <a href="#" id="mobileMyBookings">My Bookings</a>
+    <a href="Booking.php" id="mobileMyBookings">My Bookings</a>
   </div>
 
   <?php if ($isLoggedIn || $isAdmin): ?>
     <div class="mobile-nav-section" id="mobileUserMenu">
       <h4>My Account</h4>
-      <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile_form.php' ?>" id="mobileProfile">Profile</a>
+      <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile.php' ?>" id="mobileProfile">Profile</a>
       <a href="logout.php" id="mobileLogoutBtn">Logout</a>
     </div>
   <?php else: ?>
@@ -128,7 +128,7 @@ $guests = isset($_GET['guest_count']) ? (int)$_GET['guest_count'] : '';
       <div class="condo-info">
         <h3><?= $name ?></h3>
         <?php if (!$isAdmin): ?>
-        <button class="book-btn">Book Now</button>
+        <a href="book_condo.php?id=<?= $condo_id ?>" class="book-now-btn"><button type="button">Book Now</button></a>
         <?php endif; ?>
       </div>
     </div>
@@ -151,6 +151,8 @@ $guests = isset($_GET['guest_count']) ? (int)$_GET['guest_count'] : '';
   <div class="modal-box image-modal-box">
     <span class="close-btn" id="imageCloseBtn">&times;</span>
     <img id="modalImage" src="" alt="Preview"/>
+    <button class="nav-btn" id="prevImg">&#10094;</button>
+    <button class="nav-btn" id="nextImg">&#10095;</button>
   </div>
 </div>
 

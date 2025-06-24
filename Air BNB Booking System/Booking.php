@@ -38,7 +38,7 @@ $userId = $_SESSION['user_id'];
         <div class="user-menu" id="userMenu">
           <span id="accountName">My Account</span>
           <div class="dropdown" id="userDropdown">
-            <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile_form.php' ?>">Profile</a>
+            <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile.php' ?>">Profile</a>
             <a href="logout.php" id="logoutBtn">Logout</a>
           </div>
         </div>
@@ -68,7 +68,7 @@ $userId = $_SESSION['user_id'];
   <?php if ($isLoggedIn || $isAdmin): ?>
     <div class="mobile-nav-section" id="mobileUserMenu">
       <h4>My Account</h4>
-      <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile_form.php' ?>" id="mobileProfile">Profile</a>
+      <a href="<?= $isAdmin ? 'admin_profile.php' : 'profile.php' ?>" id="mobileProfile">Profile</a>
       <a href="logout.php" id="mobileLogoutBtn">Logout</a>
     </div>
   <?php else: ?>

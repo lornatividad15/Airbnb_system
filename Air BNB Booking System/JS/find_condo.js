@@ -76,11 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Handle My Bookings logic
+  // My Bookings logic
   const myBookingsLink = document.getElementById("myBookingsLink");
   const mobileMyBookings = document.getElementById("mobileMyBookings");
 
-  // Hide from admin
   if (isAdmin) {
     if (myBookingsLink) myBookingsLink.style.display = "none";
     if (mobileMyBookings) mobileMyBookings.style.display = "none";
@@ -92,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
       showModal("Please log in first to view your bookings.");
       setTimeout(() => (window.location.href = "Login form.php"), 2000);
     } else {
-      window.location.href = "booking-status.php";
+      window.location.href = "Booking.php";
     }
   };
 
@@ -102,7 +101,7 @@ document.addEventListener("DOMContentLoaded", () => {
   if (!isAdmin && mobileMyBookings)
     mobileMyBookings.addEventListener("click", handleBookingsClick);
 
-  // Check-in default value
+  // Check-in default
   const checkinInput = document.getElementById("checkin");
   if (checkinInput) {
     const now = new Date();
@@ -119,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Mobile menu toggle
+  // Mobile menu
   const shadow = document.getElementById("shadow");
   const mobileNav = document.getElementById("mobileNav");
   const toggleBtn = document.querySelector(".btn");
@@ -138,7 +137,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Mobile profile / logout
+  // Mobile profile/logout
   const mobileProfile = document.getElementById("mobileProfile");
   const mobileLogoutBtn = document.getElementById("mobileLogoutBtn");
 
@@ -163,18 +162,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Image modal viewer
+  // Image modal
   const imageModal = document.getElementById("imageModal");
   const modalImage = document.getElementById("modalImage");
   const imageCloseBtn = document.getElementById("imageCloseBtn");
-
-  const prevBtn = document.createElement("button");
-  const nextBtn = document.createElement("button");
-  prevBtn.textContent = "←";
-  nextBtn.textContent = "→";
-  prevBtn.className = nextBtn.className = "nav-btn";
-  imageModal.querySelector(".modal-box").appendChild(prevBtn);
-  imageModal.querySelector(".modal-box").appendChild(nextBtn);
+  const prevBtn = document.getElementById("prevImg");
+  const nextBtn = document.getElementById("nextImg");
 
   let currentImages = [];
   let currentIndex = 0;

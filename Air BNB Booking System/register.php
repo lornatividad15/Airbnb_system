@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Password check
     if ($password !== $confirm_password) {
-        setModal('❌ Password and Confirm Password do not match.');
+        setModal('\u274c Password and Confirm Password do not match.');
         header("Location: signup_form.php");
         exit;
     }
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
         $stmt->close();
-        setModal('❌ Email already exists. Please use a different one.');
+        setModal('\u274c Email already exists. Please use a different one.');
         header("Location: signup_form.php");
         exit;
     }
@@ -47,7 +47,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
         $stmt->close();
-        setModal('❌ Username already exists. Please choose another.');
+        setModal('\u274c Username already exists. Please choose another.');
         header("Location: signup_form.php");
         exit;
     }
@@ -60,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt->store_result();
     if ($stmt->num_rows > 0) {
         $stmt->close();
-        setModal('❌ Username already exists. Please choose another.');
+        setModal('\u274c Username already exists. Please choose another.');
         header("Location: signup_form.php");
         exit;
     }
@@ -79,14 +79,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     if ($stmt->execute()) {
         $stmt->close();
         $conn->close();
-        setModal('✅ Registration successful! You may now log in.');
+        setModal("\u2705 Registration successful! You may now log in.");
         header("Location: Login form.php");
         exit;
     } else {
         $error = htmlspecialchars($stmt->error);
         $stmt->close();
         $conn->close();
-        setModal("❌ An error occurred: $error");
+        setModal("\u274c An error occurred: $error");
         header("Location: signup_form.php");
         exit;
     }

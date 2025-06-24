@@ -8,6 +8,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $address = $_POST['address'];
     $description = $_POST['description'];
 
+    $modalMessage = '';
+    $modalType = 'error';
+    $showModal = false;
+
     if (isset($_FILES['images']) && count($_FILES['images']['name']) > 0) {
         $imageFiles = $_FILES['images'];
         $targetDir = "Images/";
@@ -21,7 +25,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         if ($coverImageIndex === -1) {
-            echo "<script>alert('Please upload at least one valid image.');</script>";
+            $modalMessage = 'Please upload at least one valid image.';
+            $modalType = 'error';
+            $showModal = true;
         } else {
             $coverImage = basename($imageFiles['name'][$coverImageIndex]);
             $coverImagePath = $targetDir . $coverImage;
@@ -57,21 +63,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             mysqli_stmt_close($imgStmt);
                         }
 
-                        echo "<script>alert('Condo and images added successfully!'); window.location.href='admin_page.php';</script>";
-                        exit;
+                        $modalMessage = 'Condo and images added successfully!';
+                        $modalType = 'success';
+                        $showModal = true;
+                        // Redirect after short delay using JS
+                        echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
                     } else {
-                        echo "<script>alert('Failed to add condo.');</script>";
+                        $modalMessage = 'Failed to add condo.';
+                        $modalType = 'error';
+                        $showModal = true;
                     }
                     mysqli_stmt_close($stmt);
                 } else {
-                    echo "<script>alert('Failed to prepare statement.');</script>";
+                    $modalMessage = 'Failed to prepare statement.';
+                    $modalType = 'error';
+                    $showModal = true;
                 }
             } else {
-                echo "<script>alert('Failed to upload cover image.');</script>";
+                $modalMessage = 'Failed to upload cover image.';
+                $modalType = 'error';
+                $showModal = true;
             }
         }
     } else {
-        echo "<script>alert('Please upload at least one image.');</script>";
+        $modalMessage = 'Please upload at least one image.';
+        $modalType = 'error';
+        $showModal = true;
     }
 }
 ?>
@@ -83,6 +100,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Add Condo</title>
   <link rel="stylesheet" href="CSS/add_condo.css" />
+  <link rel="stylesheet" href="CSS/modal_global.css" />
 </head>
 <body>
 
@@ -136,6 +154,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <button type="submit">Add Condo</button>
     <a href="admin_page.php" class="back-link">← Back to Admin Page</a>
   </form>
+
+  <!-- Modal for messages -->
+  <div id="modalOverlay" class="modal-overlay<?php if (!empty($showModal)) echo ' show'; ?>">
+    <div class="modal-box <?php echo isset($modalType) ? $modalType : ''; ?>">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <span id="modalMessage"><?php echo isset($modalMessage) ? htmlspecialchars($modalMessage) : ''; ?></span>
+    </div>
+  </div>
+
+  <script>
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+  }
+  // Auto-show modal if PHP sets it
+  <?php if (!empty($showModal)): ?>
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('modalOverlay').classList.add('show');
+    });
+  <?php endif; ?>
+  </script>
+
 </main>
 
 </body>

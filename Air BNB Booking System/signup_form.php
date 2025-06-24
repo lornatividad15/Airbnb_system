@@ -8,6 +8,7 @@ session_start();
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Sign Up</title>
   <link rel="stylesheet" href="CSS/signup_form.css" />
+  <link rel="stylesheet" href="CSS/modal_global.css" />
 </head>
 <body>
   <header>
@@ -48,13 +49,13 @@ session_start();
         <label for="password">Password</label>
         <div class="password-wrapper">
           <input type="password" id="password" name="password" required />
-          <i class="toggle-password" onclick="togglePassword('password', this)">👁️</i>
+          <span class="toggle-password" onclick="togglePassword('password')">&#128065;</span>
         </div>
 
         <label for="confirm_password">Confirm Password</label>
         <div class="password-wrapper">
           <input type="password" id="confirm_password" name="confirm_password" required />
-          <i class="toggle-password" onclick="togglePassword('confirm_password', this)">👁️</i>
+          <span class="toggle-password" onclick="togglePassword('confirm_password')">&#128065;</span>
         </div>
 
         <div class="clickable-field">
@@ -71,7 +72,7 @@ session_start();
         </select>
 
         <label for="age">Age</label>
-        <input type="number" id="age" name="age" min="1" required readonly />
+        <input type="number" id="age" name="age" min="1" required />
 
         <button type="submit">Sign Up</button>
         <p class="switch">Already have an account? <a href="Login form.php">Login</a></p>
@@ -80,30 +81,70 @@ session_start();
   </main>
 
   <script src="JS/signup_form.js"></script>
+  <script>
+    function togglePassword(fieldId) {
+      const input = document.getElementById(fieldId);
+      input.type = (input.type === "password") ? "text" : "password";
+    }
+
+    // Improved Birthdate/Age logic
+    document.addEventListener('DOMContentLoaded', function () {
+      const birthInput = document.getElementById('birthdate');
+      const ageInput = document.getElementById('age');
+      // Set max date for birthdate
+      birthInput.max = new Date().toISOString().split("T")[0];
+      // Open calendar on click anywhere in field
+      birthInput.addEventListener('focus', () => { birthInput.showPicker && birthInput.showPicker(); });
+      birthInput.addEventListener('click', () => { birthInput.showPicker && birthInput.showPicker(); });
+      // Birthdate to Age (precise)
+      birthInput.addEventListener('change', function () {
+        const birthDate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthDate.getFullYear();
+        if (
+          today.getMonth() < birthDate.getMonth() ||
+          (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+        ) {
+          age--;
+        }
+        ageInput.value = !isNaN(age) && age > 0 ? age : '';
+      });
+      // Age to Birthdate (only year changes)
+      ageInput.addEventListener('input', function () {
+        const age = parseInt(this.value);
+        if (!isNaN(age) && age > 0) {
+          const today = new Date();
+          const birthDate = new Date(birthInput.value || today);
+          const birthYear = today.getFullYear() - age;
+          birthDate.setFullYear(birthYear);
+          birthInput.value = birthDate.toISOString().split('T')[0];
+        }
+      });
+    });
+  </script>
 
   <div id="modal" class="modal-overlay">
-    <div class="modal-box">
-      <span class="close-btn" onclick="closeModal()">&times;</span>
-      <p id="modal-message"></p>
+    <div class="modal-box" id="modalBox">
+      <button class="close-btn" onclick="closeModal()">&times;</button>
+      <span id="modal-message"></span>
     </div>
   </div>
 
-  <?php
-    if (isset($_SESSION['modal_message'])) {
-      $modalMessage = $_SESSION['modal_message'];
-      echo "<script>
-        document.addEventListener('DOMContentLoaded', function () {
-          const modal = document.getElementById('modal');
-          const modalMsg = document.getElementById('modal-message');
-          modalMsg.textContent = " . json_encode($modalMessage) . ";
-          modal.classList.add('show');
-          setTimeout(() => {
-            modal.classList.remove('show');
-          }, 3000);
-        });
-      </script>";
-      unset($_SESSION['modal_message']);
+  <script>
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
     }
-  ?>
+    <?php if (isset($_SESSION['modal_message'])): ?>
+      document.addEventListener('DOMContentLoaded', function () {
+        const modal = document.getElementById('modal');
+        const modalMsg = document.getElementById('modal-message');
+        modalMsg.textContent = <?php echo json_encode($_SESSION['modal_message']); ?>;
+        modal.classList.add('show');
+        setTimeout(() => {
+          modal.classList.remove('show');
+        }, 3000);
+      });
+    <?php unset($_SESSION['modal_message']); endif; ?>
+  </script>
 </body>
 </html>

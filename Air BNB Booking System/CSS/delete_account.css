@@ -1,0 +1,53 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+.modal-box {
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 10px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+.modal-box h2 {
+  margin-bottom: 20px;
+  color: #c0392b;
+}
+.modal-box input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+.modal-box button {
+  padding: 10px 20px;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 15px;
+  margin-top: 15px;
+}
+.modal-box .cancel {
+  display: inline-block;
+  padding: 10px 20px;
+  background-color: #ccc;
+  color: black;
+  border-radius: 6px;
+  margin-left: 10px;
+  text-decoration: none;
+  font-size: 15px;
+}
+.error-msg {
+  color: #e74c3c;
+  margin-top: 10px;
+}

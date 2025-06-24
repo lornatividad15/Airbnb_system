@@ -8,42 +8,16 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$errors = [];
+$success = $error = "";
 
-// FETCH USER
-$sql = "SELECT * FROM users WHERE id = ?";
-$stmt = $conn->prepare($sql);
+// Fetch user info
+$stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $user = $stmt->get_result()->fetch_assoc();
+$stmt->close();
 
-// DELETE ACCOUNT
-if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['delete_account'])) {
-    $confirm_identifier = $_POST['confirm_identifier'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-
-    if (
-        ($confirm_identifier === $user['email'] || $confirm_identifier === $user['username']) &&
-        password_verify($confirm_password, $user['password'])
-    ) {
-        $conn->query("DELETE FROM users WHERE id = $user_id");
-        $count_check = $conn->query("SELECT COUNT(*) as count FROM users")->fetch_assoc();
-        if ($count_check['count'] == 0) {
-            $conn->query("ALTER TABLE users AUTO_INCREMENT = 1");
-        }
-        session_destroy();
-        $_SESSION['profile_message'] = '✅ Account deleted successfully.';
-        header("Location: Login form.php");
-        exit;
-    } else {
-        $_SESSION['profile_message'] = '❌ Invalid credentials. Account not deleted.';
-        header("Location: profile_form.php");
-        exit;
-    }
-}
-
-// PROFILE UPDATE
-if ($_SERVER["REQUEST_METHOD"] === "POST" && !isset($_POST['delete_account'])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST['update_profile'])) {
     $firstname = $_POST['firstname'];
     $lastname = $_POST['lastname'];
     $username = $_POST['username'];
@@ -60,73 +34,215 @@ if ($_SERVER["REQUEST_METHOD"] === "POST" && !isset($_POST['delete_account'])) {
     $new_password = $_POST['new_password'];
     $confirm_password = $_POST['confirm_password'];
 
+    $email_to_save = $user['email'];
+    $password_to_save = $user['password'];
     $profile_picture = $user['profile_picture'];
 
-
-    $maxSize = 12000000; // Set max size to ~12MB instead of 16MB
-    if (!empty($_FILES['profile_picture']['tmp_name'])) {
-        $fileSize = $_FILES['profile_picture']['size'];
-        if ($fileSize > $maxSize) {
-            $_SESSION['profile_error'] = '❌ Profile picture too large. Max allowed size is 12MB.';
-            header("Location: profile_form.php");
-            exit;
-        }
+    // Profile picture
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === UPLOAD_ERR_OK) {
         $profile_picture = file_get_contents($_FILES['profile_picture']['tmp_name']);
     }
 
-    $email_to_save = $user['email'];
-    $password_to_save = $user['password'];
-
+    // Email validation
     if (!empty($new_email)) {
         if ($new_email === $user['email']) {
-            $errors[] = "New email must be different from current email.";
+            $error = "New email must be different.";
         } elseif ($new_email !== $confirm_email) {
-            $errors[] = "New email and confirm email do not match.";
+            $error = "New email does not match confirmation.";
         } else {
             $email_to_save = $new_email;
         }
     }
 
-    if (!empty($new_password)) {
-        if (!password_verify($current_password, $user['password'])) {
-            $errors[] = "Current password is incorrect.";
-        } elseif ($new_password === $current_password) {
-            $errors[] = "New password must be different from current password.";
-        } elseif ($new_password !== $confirm_password) {
-            $errors[] = "New password and confirm password do not match.";
-        } else {
-            $password_to_save = password_hash($new_password, PASSWORD_DEFAULT);
+    // Password validation (like admin_profile)
+    if (!$error && (!empty($current_password) || !empty($new_password) || !empty($confirm_password))) {
+        if (empty($current_password)) {
+            $error = "Please enter your current password.";
+        } elseif (!password_verify($current_password, $user['password'])) {
+            $error = "Current password is incorrect.";
+        } elseif (!empty($new_password)) {
+            if ($new_password !== $confirm_password) {
+                $error = "New password and confirm password do not match.";
+            } elseif (password_verify($new_password, $user['password'])) {
+                $error = "New password must be different from your current password.";
+            } else {
+                $password_to_save = password_hash($new_password, PASSWORD_DEFAULT);
+            }
         }
     }
 
-    if (empty($errors)) {
-        $update_sql = "UPDATE users SET 
-            firstname = ?, lastname = ?, username = ?, phone_number = ?, birthdate = ?, 
-            sex = ?, age = ?, email = ?, password = ?, profile_picture = ? 
-            WHERE id = ?";
+    // Username validation
+    if (!$error && $username !== $user['username']) {
+        // Check in users table (exclude self)
+        $stmt = $conn->prepare("SELECT id FROM users WHERE username = ? AND id != ?");
+        $stmt->bind_param("si", $username, $user_id);
+        $stmt->execute();
+        $stmt->store_result();
+        if ($stmt->num_rows > 0) {
+            $error = "Username already exists.";
+        }
+        $stmt->close();
+        // Check in admins table
+        if (!$error) {
+            $stmt = $conn->prepare("SELECT admin_id FROM admins WHERE username = ?");
+            $stmt->bind_param("s", $username);
+            $stmt->execute();
+            $stmt->store_result();
+            if ($stmt->num_rows > 0) {
+                $error = "Username already exists.";
+            }
+            $stmt->close();
+        }
+    }
 
-        $stmt = $conn->prepare($update_sql);
-
-        // Use dummy value for the blob temporarily
+    if (!$error) {
+        $sql = "UPDATE users SET firstname=?, lastname=?, username=?, phone_number=?, birthdate=?, sex=?, age=?, email=?, password=?, profile_picture=? WHERE id=?";
+        $stmt = $conn->prepare($sql);
         $null = NULL;
-
-        $stmt->bind_param("ssssssissbi", 
-            $firstname, $lastname, $username, $phone_number, $birthdate, 
+        $stmt->bind_param("ssssssissbi",
+            $firstname, $lastname, $username, $phone_number, $birthdate,
             $sex, $age, $email_to_save, $password_to_save, $null, $user_id);
-
         if (!empty($profile_picture)) {
-            $stmt->send_long_data(9, $profile_picture); // index 9 for `profile_picture` in bind_param
+            $stmt->send_long_data(9, $profile_picture);
         }
         if ($stmt->execute()) {
-            $_SESSION['profile_message'] = '✅ Profile updated successfully.';
+            $success = "✅ Profile updated successfully.";
         } else {
-            $_SESSION['profile_message'] = '❌ Failed to update profile.';
+            $error = "❌ Database error. Try again.";
         }
-    } else {
-        $_SESSION['profile_error'] = '❌ ' . $errors[0];
+        $stmt->close();
+        // Refresh user info
+        $stmt = $conn->prepare("SELECT * FROM users WHERE id = ?");
+        $stmt->bind_param("i", $user_id);
+        $stmt->execute();
+        $user = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
     }
-
-    header("Location: profile_form.php");
-    exit;
 }
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Profile</title>
+  <link rel="stylesheet" href="CSS/profile_form.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+<header>
+  <div class="header-inner">
+    <a href="Main Page.php" class="logo">
+      <img src="Images/logo-light-transparent.png" alt="Site Logo" />
+    </a>
+  </div>
+</header>
+<main class="profile-container">
+  <form id="profileForm" method="post" enctype="multipart/form-data">
+    <h1 class="profile-title">MY PROFILE</h1>
+    <?php if ($success) {
+      echo '<link rel="stylesheet" href="CSS/modal_global.css" />';
+      echo '<div id="modalOverlay" class="modal-overlay show">';
+      echo '<div class="modal-box success">';
+      echo '<button class="close-btn" onclick="closeModal()">&times;</button>';
+      echo '<span id="modalMessage">' . htmlspecialchars($success) . '</span>';
+      echo '</div></div>';
+      echo '<script>function closeModal(){document.getElementById("modalOverlay").classList.remove("show");}document.addEventListener("DOMContentLoaded",function(){document.getElementById("modalOverlay").classList.add("show");setTimeout(closeModal,3000);});</script>';
+  } ?>
+    <?php if ($error) {
+      echo '<link rel="stylesheet" href="CSS/modal_global.css" />';
+      echo '<div id="modalOverlay" class="modal-overlay show">';
+      echo '<div class="modal-box error">';
+      echo '<button class="close-btn" onclick="closeModal()">&times;</button>';
+      echo '<span id="modalMessage">' . htmlspecialchars($error) . '</span>';
+      echo '</div></div>';
+      echo '<script>function closeModal(){document.getElementById("modalOverlay").classList.remove("show");}document.addEventListener("DOMContentLoaded",function(){document.getElementById("modalOverlay").classList.add("show");setTimeout(closeModal,3000);});</script>';
+  } ?>
+    <div class="profile-picture">
+      <img 
+        src="<?php echo !empty($user['profile_picture']) 
+          ? 'data:image/jpeg;base64,' . base64_encode($user['profile_picture']) 
+          : 'Images/profile_logo.png'; ?>" 
+        id="profileImg" alt="Profile Picture">
+      <input type="file" id="profileUpload" name="profile_picture" accept="image/*">
+    </div>
+    <div class="profile-dropdown" id="profileDropdown">
+      <button type="button" id="showProfilePic">SHOW PROFILE PICTURE</button>
+      <label for="profileUpload" id="changeProfilePic">CHANGE PROFILE PICTURE</label>
+    </div>
+    <div class="form-group"><label>First Name</label>
+      <input type="text" name="firstname" value="<?= htmlspecialchars($user['firstname']) ?>" required></div>
+    <div class="form-group"><label>Last Name</label>
+      <input type="text" name="lastname" value="<?= htmlspecialchars($user['lastname']) ?>" required></div>
+    <div class="form-group"><label>Current Email</label>
+      <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" readonly style="background:#f5f5f5;pointer-events:none;" tabindex="-1"></div>
+    <div class="form-group"><label>Username</label>
+      <input type="text" name="username" value="<?= htmlspecialchars($user['username']) ?>" required></div>
+    <div class="form-group"><label>Phone Number</label>
+      <input type="text" name="phone_number" value="<?= htmlspecialchars($user['phone_number']) ?>"></div>
+    <div class="form-group"><label>Birthdate</label>
+      <input type="date" id="birthdate" name="birthdate" max="<?= date('Y-m-d', strtotime('-1 day')) ?>" value="<?= htmlspecialchars($user['birthdate']) ?>"></div>
+    <div class="form-group"><label>Age</label>
+      <input type="number" id="age" name="age" value="<?= htmlspecialchars($user['age']) ?>" required></div>
+    <hr><h2 class="section-title">Change Email</h2>
+    <div class="form-group"><label>New Email</label><input type="email" name="new_email"></div>
+    <div class="form-group"><label>Confirm New Email</label><input type="email" name="confirm_email"></div>
+    <hr><h2 class="section-title">Change Password</h2>
+    <div class="form-group password-field">
+      <label>Current Password</label>
+      <input type="password" id="currentPassword" name="current_password">
+      <span class="toggle-password" onclick="togglePassword('currentPassword')">&#128065;</span>
+    </div>
+    <div class="form-group password-field">
+      <label>New Password</label>
+      <input type="password" id="newPassword" name="new_password">
+      <span class="toggle-password" onclick="togglePassword('newPassword')">&#128065;</span>
+    </div>
+    <div class="form-group password-field">
+      <label>Confirm New Password</label>
+      <input type="password" id="confirmPassword" name="confirm_password">
+      <span class="toggle-password" onclick="togglePassword('confirmPassword')">&#128065;</span>
+    </div>
+    <input type="hidden" name="update_profile" value="1">
+    <button type="submit">Save Changes</button>
+    <button type="button" class="delete-button" id="deleteBtn">Delete Account</button>
+  </form>
+</main>
+<div class="modal-overlay" id="modalOverlay">
+</div>
+<script src="JS/profile_form.js"></script>
+<script>
+// Improved Birthdate/Age logic
+  document.addEventListener('DOMContentLoaded', function () {
+    const birthInput = document.getElementById('birthdate');
+    const ageInput = document.getElementById('age');
+    if (!birthInput || !ageInput) return;
+    birthInput.max = new Date().toISOString().split("T")[0];
+    birthInput.addEventListener('focus', () => { birthInput.showPicker && birthInput.showPicker(); });
+    birthInput.addEventListener('click', () => { birthInput.showPicker && birthInput.showPicker(); });
+    birthInput.addEventListener('change', function () {
+      const birthDate = new Date(this.value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      if (
+        today.getMonth() < birthDate.getMonth() ||
+        (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())
+      ) {
+        age--;
+      }
+      ageInput.value = !isNaN(age) && age > 0 ? age : '';
+    });
+    ageInput.addEventListener('input', function () {
+      const age = parseInt(this.value);
+      if (!isNaN(age) && age > 0) {
+        const today = new Date();
+        const birthDate = new Date(birthInput.value || today);
+        const birthYear = today.getFullYear() - age;
+        birthDate.setFullYear(birthYear);
+        birthInput.value = birthDate.toISOString().split('T')[0];
+      }
+    });
+  });
+</script>
+</body>
+</html>

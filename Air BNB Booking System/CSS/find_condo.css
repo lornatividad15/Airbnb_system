@@ -10,12 +10,12 @@ position:sticky;
 top:0;
 z-index:1102;
 }
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 10px;
+.header-inner{
+display:flex;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:10px;
 }
 .logo img{
 height:40px;
@@ -161,7 +161,7 @@ transition:right 0.3s ease;
 }
 .mobile-nav.active{
 right:0;
- display: flex !important;
+display:flex !important;
 }
 .mobile-nav-section{
 display:flex;
@@ -239,28 +239,6 @@ cursor:pointer;
 .condo-info button:hover{
 background-color:#303f5d;
 }
-.nav-btn{
-position:absolute;
-top:50%;
-transform:translateY(-50%);
-background:rgba(255,255,255,0.15);
-color:white;
-border:none;
-font-size:24px;
-padding:10px;
-cursor:pointer;
-z-index:10000;
-border-radius:50%;
-}
-.nav-btn:hover{
-background:rgba(255,255,255,0.3);
-}
-.nav-btn:first-of-type{
-left:10px;
-}
-.nav-btn:last-of-type{
-right:10px;
-}
 @media (max-width:767px){
 .center-nav,
 .right-nav{
@@ -268,9 +246,6 @@ display:none;
 }
 .btn{
 display:flex;
-}
-.mobile-nav{
-display:none;
 }
 .mobile-nav.active{
 display:block;
@@ -355,28 +330,26 @@ opacity:1;
 transform:translateY(0);
 }
 }
-.fullscreen-modal,
-#imageModal.modal-overlay{
-display:none;
+.nav-btn{
 position:fixed;
-inset:0;
-z-index:9999;
-background:rgba(0,0,0,0.95);
-justify-content:center;
-align-items:center;
-}
-.fullscreen-modal img,
-#imageModal img{
-max-width:90%;
-max-height:90%;
-border-radius:10px;
-}
-.fullscreen-modal .close-btn,
-#imageModal .close-btn{
-position:absolute;
-top:20px;
-right:30px;
-font-size:30px;
+top:50%;
+transform:translateY(-50%);
+background:rgba(0,0,0,0.4);
 color:white;
+border:none;
+font-size:40px;
+padding:10px 15px;
+z-index:10001;
 cursor:pointer;
+border-radius:50%;
+transition:background 0.3s ease;
+}
+.nav-btn:hover{
+background:rgba(0,0,0,0.7);
+}
+#prevImg{
+left:20px;
+}
+#nextImg{
+right:20px;
 }

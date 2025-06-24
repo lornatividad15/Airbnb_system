@@ -36,10 +36,18 @@ if (isset($_GET['id'])) {
         $conn->query("ALTER TABLE condo_images AUTO_INCREMENT = 1");
     }
 
-    echo "<script>alert('Condo deleted successfully!'); window.location.href='admin_page.php';</script>";
+    $modalMessage = 'Condo deleted successfully!';
+    $modalType = 'success';
+    $showModal = true;
+    echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
+    include __DIR__ . '/modal_snippet.php';
     exit;
 } else {
-    echo "<script>alert('No condo ID provided.'); window.location.href='admin_page.php';</script>";
+    $modalMessage = 'No condo ID provided.';
+    $modalType = 'error';
+    $showModal = true;
+    echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
+    include __DIR__ . '/modal_snippet.php';
     exit;
 }
 ?>

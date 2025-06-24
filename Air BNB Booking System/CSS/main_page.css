@@ -368,9 +368,11 @@ cursor:pointer;
 }
 .image-viewer-modal .nav-btns {
   position: absolute;
-  bottom: 40px;
+  inset: 0;
   display: flex;
-  gap: 20px;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none; 
 }
 .image-viewer-modal .nav-btns button {
   background: rgba(255, 255, 255, 0.15);
@@ -382,15 +384,12 @@ cursor:pointer;
   z-index: 10000;
   cursor: pointer;
   transition: background 0.3s;
-  top: 50%;
-  transform: translateY(-50%);
-  position: absolute;
-  display: flex;
+  pointer-events: all; 
+  margin: 0 20px;
 }
 .image-viewer-modal .nav-btns button:hover {
   background: rgba(255, 255, 255, 0.3);
 }
-
 
 #mobileUserMenu,
 #mobileAuthMenu {
@@ -414,4 +413,42 @@ cursor:pointer;
 #mobileProfile{
   margin-top: 25px;
 }
-
+.feature-section {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 20px;
+  background-color: #f9f9f9;
+  border-top: 1px solid #ccc;
+}
+.feature-section img {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 12px;
+  margin: 0 auto;
+  flex: 1 1 400px;
+}
+.feature-description {
+  flex: 1 1 400px;
+  padding: 20px;
+  max-width: 600px;
+  margin-left: 30px;
+}
+.feature-description h2 {
+  font-size: 26px;
+  color: #303f5d;
+  margin-bottom: 10px;
+}
+.feature-description p {
+  font-size: 16px;
+  color: #333;
+  line-height: 1.6;
+}
+.feature-image {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 20px;
+  margin-right: 40px; 
+}

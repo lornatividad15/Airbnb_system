@@ -3,7 +3,11 @@ include 'config.php';
 session_start();
 
 if (!isset($_GET['id'])) {
-    echo "<script>alert('No condo selected'); window.location.href='admin_page.php';</script>";
+    $modalMessage = 'No condo selected';
+    $modalType = 'error';
+    $showModal = true;
+    echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
+    include __DIR__ . '/modal_snippet.php';
     exit;
 }
 
@@ -15,7 +19,11 @@ $stmt->execute();
 $result = $stmt->get_result();
 
 if ($result->num_rows == 0) {
-    echo "<script>alert('Condo not found'); window.location.href='admin_page.php';</script>";
+    $modalMessage = 'Condo not found';
+    $modalType = 'error';
+    $showModal = true;
+    echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
+    include __DIR__ . '/modal_snippet.php';
     exit;
 }
 $condo = $result->fetch_assoc();
@@ -50,7 +58,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['name'])) {
         }
     }
 
-    echo "<script>alert('Condo updated successfully!'); window.location.href='admin_page.php';</script>";
+    $modalMessage = 'Condo updated successfully!';
+    $modalType = 'success';
+    $showModal = true;
+    echo "<script>setTimeout(function(){ window.location.href='admin_page.php'; }, 1500);</script>";
+    include __DIR__ . '/modal_snippet.php';
     exit;
 }
 
