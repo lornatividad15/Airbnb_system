@@ -1,0 +1,355 @@
+body{
+margin:0;
+font-family:Arial,sans-serif;
+}
+header{
+background-color:#45526d;
+color:white;
+padding:10px 20px;
+position:sticky;
+top:0;
+z-index:1102;
+}
+.header-inner{
+display:flex;
+align-items:center;
+justify-content:space-between;
+flex-wrap:wrap;
+gap:10px;
+}
+.logo img{
+height:40px;
+}
+.center-nav,
+.right-nav{
+display:flex;
+gap:15px;
+align-items:center;
+}
+.right-nav{
+transform:translate(-60%);
+}
+.center-nav a,
+.right-nav a{
+position:relative;
+color:white;
+text-decoration:none;
+font-size:14px;
+}
+.center-nav a::after,
+.right-nav a::after{
+content:"";
+position:absolute;
+left:0;
+bottom:-3px;
+height:2px;
+width:0;
+background-color:white;
+transition:width 0.3s ease;
+}
+.center-nav a:hover::after,
+.right-nav a:hover::after{
+width:100%;
+}
+.user-menu{
+position:relative;
+cursor:pointer;
+color:white;
+}
+.user-menu span{
+font-size:14px;
+display:inline-block;
+color:white;
+cursor:pointer;
+position:relative;
+}
+.user-menu span::after{
+content:"";
+position:absolute;
+left:0;
+bottom:-3px;
+height:2px;
+width:0;
+background-color:white;
+transition:width 0.3s ease;
+}
+.user-menu span:hover::after{
+width:100%;
+}
+.user-menu .dropdown{
+display:none;
+position:absolute;
+top:30px;
+right:0;
+background-color:#334;
+padding:10px;
+border-radius:6px;
+min-width:120px;
+z-index:1500;
+}
+.user-menu .dropdown.show{
+display:block;
+}
+.user-menu .dropdown a{
+color:white;
+display:block;
+padding:5px 0;
+text-decoration:none;
+}
+.user-menu .dropdown a:hover{
+text-decoration:underline;
+}
+.btn{
+display:flex;
+flex-direction:column;
+justify-content:space-between;
+width:30px;
+height:21px;
+background:none;
+border:none;
+cursor:pointer;
+position:absolute;
+right:20px;
+top:50%;
+transform:translateY(-50%);
+z-index:1501;
+}
+.btn span{
+height:3px;
+width:100%;
+background-color:white;
+border-radius:2px;
+transition:transform 0.4s ease,opacity 0.4s ease;
+}
+.btn.active span:nth-child(1){
+transform:translateY(9px) rotate(45deg);
+}
+.btn.active span:nth-child(2){
+opacity:0;
+}
+.btn.active span:nth-child(3){
+transform:translateY(-9px) rotate(-45deg);
+}
+.btn.active span{
+background-color:#333;
+}
+.shadow{
+display:none;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.5);
+z-index:1000;
+}
+.shadow.active{
+display:block;
+}
+.mobile-nav{
+display:none;
+position:fixed;
+top:0;
+right:-100%;
+width:85%;
+max-width:300px;
+height:100%;
+background:#f7f7f7;
+box-shadow:-2px 0 8px rgba(0,0,0,0.2);
+padding:80px 20px 40px;
+flex-direction:column;
+gap:40px;
+z-index:1100;
+transition:right 0.3s ease;
+}
+.mobile-nav.active{
+right:0;
+display:flex !important;
+}
+.mobile-nav-section{
+display:flex;
+flex-direction:column;
+gap:10px;
+border-top:1px solid #ddd;
+padding-top:20px;
+}
+.mobile-nav a{
+color:#333;
+text-decoration:none;
+font-size:16px;
+padding:10px;
+border-radius:6px;
+}
+.mobile-nav a:hover{
+background-color:#e4e4e4;
+}
+.condos{
+padding:20px;
+}
+.condos h2{
+text-align:center;
+color:#45526d;
+font-size:26px;
+margin:30px 0 10px;
+}
+.condo-container{
+display:flex;
+flex-direction:column;
+gap:20px;
+}
+.condo-card{
+border:1px solid #ccc;
+padding:10px;
+border-radius:10px;
+background:#fff;
+overflow:hidden;
+transition:transform 0.3s ease;
+}
+.condo-image{
+overflow:hidden;
+position:relative;
+cursor:pointer;
+}
+.condo-image img.slider{
+width:100%;
+max-height:300px;
+object-fit:cover;
+border-radius:10px;
+transition:transform 0.3s ease-in-out;
+}
+.condo-image img.slider:hover{
+transform:scale(1.03);
+}
+.condo-image:hover img.slider{
+transform:scale(1.05);
+}
+.condo-info{
+text-align:center;
+margin-top:10px;
+}
+.condo-info h3{
+margin-bottom:10px;
+font-size:18px;
+}
+.condo-info button{
+padding:8px 16px;
+background-color:#45526d;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+.condo-info button:hover{
+background-color:#303f5d;
+}
+@media (max-width:767px){
+.center-nav,
+.right-nav{
+display:none;
+}
+.btn{
+display:flex;
+}
+.mobile-nav.active{
+display:block;
+}
+.shadow.active{
+display:block;
+}
+}
+@media (min-width:768px){
+.condo-container{
+flex-direction:row;
+flex-wrap:wrap;
+justify-content:space-around;
+}
+.condo-card{
+flex:0 1 45%;
+}
+#mobileUserMenu,
+#mobileAuthMenu,
+#mobileNavLinks{
+display:none !important;
+}
+}
+.modal-overlay{
+display:none;
+position:fixed;
+inset:0;
+background-color:rgba(0,0,0,0.6);
+z-index:9999;
+justify-content:center;
+align-items:center;
+}
+.modal-box{
+background-color:#45526d;
+color:white;
+padding:20px 30px;
+border-radius:10px;
+max-width:400px;
+width:90%;
+text-align:center;
+position:relative;
+box-shadow:0 10px 25px rgba(0,0,0,0.3);
+animation:fadeIn 0.3s ease;
+}
+.modal-box p{
+margin:0;
+font-size:16px;
+}
+.modal-box.image-modal-box{
+background:transparent;
+padding:0;
+max-width:unset;
+max-height:unset;
+box-shadow:none;
+border:none;
+display:flex;
+justify-content:center;
+align-items:center;
+position:relative;
+}
+.modal-box.image-modal-box img{
+max-width:90%;
+max-height:80vh;
+border-radius:8px;
+box-shadow:0 0 20px rgba(255,255,255,0.2);
+}
+.close-btn{
+position:absolute;
+top:10px;
+right:15px;
+font-size:20px;
+color:white;
+cursor:pointer;
+}
+@keyframes fadeIn{
+from{
+opacity:0;
+transform:translateY(-10px);
+}
+to{
+opacity:1;
+transform:translateY(0);
+}
+}
+.nav-btn{
+position:fixed;
+top:50%;
+transform:translateY(-50%);
+background:rgba(0,0,0,0.4);
+color:white;
+border:none;
+font-size:40px;
+padding:10px 15px;
+z-index:10001;
+cursor:pointer;
+border-radius:50%;
+transition:background 0.3s ease;
+}
+.nav-btn:hover{
+background:rgba(0,0,0,0.7);
+}
+#prevImg{
+left:20px;
+}
+#nextImg{
+right:20px;
+}
