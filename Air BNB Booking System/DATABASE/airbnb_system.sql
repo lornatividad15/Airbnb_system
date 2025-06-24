@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jun 24, 2025 at 05:39 PM
+-- Generation Time: Jun 24, 2025 at 10:40 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -55,7 +55,7 @@ CREATE TABLE `bookings` (
   `checkin` datetime NOT NULL,
   `checkout` datetime NOT NULL,
   `user_id` int(11) NOT NULL,
-  `status` enum('confirmed','pending_cancel','cancelled','cancel_rejected') NOT NULL,
+  `status` enum('Confirmed','Pending','Cancelled','Confirmed (Cancellation Rejected)') NOT NULL,
   `cancellation_reason` text DEFAULT NULL,
   `user_hidden` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -182,7 +182,7 @@ ALTER TABLE `admins`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `condos`
